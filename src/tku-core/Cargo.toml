@@ -1,0 +1,21 @@
+[package]
+name        = "tku-core"
+description = "Core runtime for tkucli: router, middleware, output engine, handler traits"
+version.workspace    = true
+edition.workspace    = true
+authors.workspace    = true
+license.workspace    = true
+
+[dependencies]
+tokio.workspace       = true
+serde.workspace       = true
+serde_json.workspace  = true
+thiserror.workspace   = true
+anyhow.workspace      = true
+clap.workspace        = true
+tabled.workspace      = true
+indicatif.workspace   = true
+tracing.workspace     = true
+async-trait.workspace = true
+toml.workspace        = true
+serde_yaml.workspace  = true

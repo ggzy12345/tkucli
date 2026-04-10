@@ -1,4 +1,4 @@
-# tkucli
+# Tkucli
 
 **A resource-oriented CLI framework for Rust**, inspired by web frameworks like Express and Spring.
 
@@ -46,11 +46,6 @@ description = "My Tkucli CLI"
 enabled = true
 theme   = "dark"
 
-[root]
-  [[root.operation]]
-  verb        = "status"
-  description = "Check system status"
-
 [[resource]]
 name        = "users"
 description = "Manage users"
@@ -66,15 +61,6 @@ description = "Manage users"
   verb        = "get"
   description = "Fetch a user by ID"
   args = [{ name = "id", type = "u64", required = true }]
-
-  [[resource.subresource]]
-  name        = "roles"
-  description = "User roles"
-
-    [[resource.subresource.operation]]
-    verb        = "list"
-    description = "List roles for a user"
-    args = [{ name = "user_id", type = "u64", required = true }]
 ```
 
 ### 4. Implement handlers
@@ -103,11 +89,9 @@ impl crate::generated::handler_traits::UsersHandler for UsersHandler {
 ### 5. Run
 
 ```bash
-cargo run -- status
 cargo run -- users list
 cargo run -- users list --format json
 cargo run -- users get 42
-cargo run -- users roles list 42
 cargo run -- --tui          # interactive TUI
 ```
 
@@ -132,12 +116,6 @@ cargo run -- --tui          # interactive TUI
 | `theme`          | string | `"dark"`  | `dark` \| `light`                  |
 | `default_screen` | string | —         | Resource name to show on launch    |
 
-### `[root]`
-
-| Key         | Type  | Description                              |
-|-------------|-------|------------------------------------------|
-| `operation` | array | List of operations at the root level.    |
-
 ### `[[resource]]`
 
 | Key           | Type   | Description                              |
@@ -145,17 +123,8 @@ cargo run -- --tui          # interactive TUI
 | `name`        | string | Resource identifier (e.g. `users`)       |
 | `description` | string | Shown in help                            |
 | `operation`   | array  | List of operations (see below)           |
-| `subresource` | array  | List of nested subresources              |
 
-### `[[resource.subresource]]`
-
-| Key           | Type   | Description                              |
-|---------------|--------|------------------------------------------|
-| `name`        | string | Subresource identifier (e.g. `roles`)    |
-| `description` | string | Shown in help                            |
-| `operation`   | array  | List of operations for the subresource   |
-
-### `[[*.operation]]` (Applies to root, resource, and subresource)
+### `[[resource.operation]]`
 
 | Key           | Type   | Description                                         |
 |---------------|--------|-----------------------------------------------------|

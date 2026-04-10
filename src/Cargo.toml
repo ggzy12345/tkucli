@@ -1,0 +1,38 @@
+[workspace]
+members = [
+    "tku-core",
+    "tku-tui",
+    "tku-macros",
+    "tku-codegen",
+    "tkucli",
+]
+resolver = "2"
+
+[workspace.package]
+version     = "0.1.0"
+edition     = "2021"
+authors     = ["ggzy12345@gmail.com"]
+license     = "MIT"
+repository  = "https://github.com/ggzy12345/tkucli"
+
+[workspace.dependencies]
+# Shared deps — all crates reference these via `workspace = true`
+tokio       = { version = "1",      features = ["full"] }
+serde       = { version = "1",      features = ["derive"] }
+serde_json  = "1"
+toml        = "0.8"
+serde_yaml  = "0.9"
+thiserror   = "1"
+anyhow      = "1"
+clap        = { version = "4",      features = ["derive", "env"] }
+ratatui     = "0.27"
+crossterm   = { version = "0.27",   features = ["event-stream"] }
+tabled      = "0.15"
+indicatif   = "0.17"
+tracing     = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+async-trait = "0.1"
+proc-macro2 = "1"
+quote       = "1"
+syn         = { version = "2",      features = ["full"] }
+prettyplease = "0.2"

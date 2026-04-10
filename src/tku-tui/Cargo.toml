@@ -1,0 +1,17 @@
+[package]
+name        = "tku-tui"
+description = "Ratatui TUI shell for tkucli: navigation, forms, data views"
+version.workspace  = true
+edition.workspace  = true
+authors.workspace  = true
+license.workspace  = true
+
+[dependencies]
+tku-core            = { path = "../tku-core" }
+ratatui.workspace   = true
+crossterm.workspace = true
+tokio.workspace     = true
+serde.workspace     = true
+thiserror.workspace = true
+anyhow.workspace    = true
+async-trait.workspace = true

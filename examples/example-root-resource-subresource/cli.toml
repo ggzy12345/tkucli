@@ -1,0 +1,56 @@
+[app]
+name           = "cli-example"
+version        = "0.1.0"
+description    = "A tku-powered CLI"
+default_output = "table"
+
+[tui]
+enabled        = false
+theme          = "dark"
+
+[root]
+
+  [[root.operation]]
+  verb        = "list"
+  description = "List items"
+  flags       = [
+    { name = "limit", short = "n", type = "u32", default = "20", help = "Max results" },
+  ]
+
+  [[root.operation]]
+  verb        = "get"
+  description = "Get an item by ID"
+  args        = [{ name = "id", type = "u64", required = true }]
+
+[[resource]]
+name        = "vm"
+description = "Virtual machines"
+
+  [[resource.operation]]
+  verb        = "list"
+  description = "List all virtual machines"
+  flags       = [
+    { name = "limit", short = "n", type = "u32", default = "20", help = "Max results" },
+  ]
+
+  [[resource.operation]]
+  verb        = "get"
+  description = "Get a virtual machine by ID"
+  args        = [{ name = "id", type = "u64", required = true }]
+
+  [[resource.subresource]]
+  name        = "disk"
+  description = "Virtual machine disks"
+
+    [[resource.subresource.operation]]
+    verb        = "list"
+    description = "List disks for a VM"
+    args        = [{ name = "vm_id", type = "u64", required = true }]
+
+    [[resource.subresource.operation]]
+    verb        = "attach"
+    description = "Attach a disk to a VM"
+    args        = [
+      { name = "vm_id", type = "u64", required = true },
+      { name = "disk_id", type = "u64", required = true },
+    ]
