@@ -1,0 +1,35 @@
+[app]
+name           = "vm-cli"
+version        = "0.1.0"
+description    = "A Tkucli-powered CLI"
+default_output = "table"
+
+[tui]
+enabled        = true
+theme          = "dark"
+
+[[resource]]
+name        = "vm"
+description = "VM resource — replace with your own"
+
+  [[resource.operation]]
+  verb        = "create"
+  description = "create a vm"
+  args        = [{ name = "name", type = "string", required = true }]
+
+  [[resource.operation]]
+  verb        = "list"
+  description = "List all examples"
+  flags       = [
+    { name = "limit", short = "n", type = "u32", default = "20", help = "Max results" },
+  ]
+
+  [[resource.operation]]
+  verb        = "get"
+  description = "Get a vm by name"
+  args        = [{ name = "name", type = "string", required = true }]
+
+  [[resource.operation]]
+  verb        = "delete"
+  description = "Get a vm by name"
+  args        = [{ name = "name", type = "string", required = true }]

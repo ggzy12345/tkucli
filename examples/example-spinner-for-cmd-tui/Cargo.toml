@@ -1,0 +1,18 @@
+[package]
+name    = "vm-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tku-core    = { path = "../../src/tku-core" }   # will adjust once published, keep it if use source code build
+tku-tui     = { path = "../../src/tku-tui" }
+tku-macros  = { path = "../../src/tku-macros" }
+tokio         = { version = "1", features = ["full"] }
+serde         = { version = "1", features = ["derive"] }
+clap          = { version = "4", features = ["derive"] }
+tabled        = "0.15"
+async-trait   = "0.1"
+anyhow        = "1"
+
+[build-dependencies]
+tku-codegen = { path = "../../src/tku-codegen" }

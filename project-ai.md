@@ -17,6 +17,7 @@ Dependencies:
 - src/tku-core/src/lib.rs
 - src/tku-core/src/middleware.rs
 - src/tku-core/src/output.rs
+- src/tku-core/src/progress.rs
 - src/tku-core/src/router.rs
 - src/tku-core/src/schema.rs
 - src/tku-macros/Cargo.toml
@@ -213,6 +214,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
+name = "cliclack"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4529f45438fc25ca048b242d5c48e2d3ce9a521e2a5a9123d9737d8520b030dd"
+dependencies = [
+ "console 0.16.3",
+ "indicatif 0.18.4",
+ "once_cell",
+ "strsim",
+ "textwrap",
+ "zeroize",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -242,6 +257,18 @@ dependencies = [
  "once_cell",
  "unicode-width 0.2.2",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "console"
+version = "0.16.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d64e8af5551369d19cf50138de61f1c42074ab970f74e99be916646777f8fc87"
+dependencies = [
+ "encode_unicode",
+ "libc",
+ "unicode-width 0.2.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -361,10 +388,23 @@ version = "0.17.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "183b3088984b400f4cfac3620d5e076c84da5364016b4f49473de574b2586235"
 dependencies = [
- "console",
+ "console 0.15.11",
  "number_prefix",
  "portable-atomic",
  "unicode-width 0.2.2",
+ "web-time",
+]
+
+[[package]]
+name = "indicatif"
+version = "0.18.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25470f23803092da7d239834776d653104d551bc4d7eacaf31e6837854b8e9eb"
+dependencies = [
+ "console 0.16.3",
+ "portable-atomic",
+ "unicode-width 0.2.2",
+ "unit-prefix",
  "web-time",
 ]
 
@@ -781,6 +821,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
+name = "smawk"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7c388c1b5e93756d0c740965c41e8822f866621d41acbdf6336a6a168f8840c"
+
+[[package]]
 name = "socket2"
 version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -881,6 +927,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "textwrap"
+version = "0.16.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c13547615a44dc9c452a8a534638acdf07120d4b6847c8178705da06306a3057"
+dependencies = [
+ "smawk",
+ "unicode-linebreak",
+ "unicode-width 0.2.2",
+]
+
+[[package]]
 name = "thiserror"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -932,7 +989,8 @@ dependencies = [
  "anyhow",
  "async-trait",
  "clap",
- "indicatif",
+ "cliclack",
+ "indicatif 0.17.11",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -1119,6 +1177,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
 
 [[package]]
+name = "unicode-linebreak"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b09c83c3c29d37506a3e260c08c03743a6bb66a9cd432c6934ab501a190571f"
+
+[[package]]
 name = "unicode-segmentation"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1146,6 +1210,12 @@ name = "unicode-width"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
+
+[[package]]
+name = "unit-prefix"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81e544489bf3d8ef66c953931f56617f423cd4b5494be343d9b9d3dda037b9a3"
 
 [[package]]
 name = "unsafe-libyaml"
@@ -1418,6 +1488,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "zeroize"
+version = "1.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97154e67e32c85465826e8bcc1c59429aaaf107c1e4a9e53c8d8ccd5eff88d0"
+dependencies = [
+ "zeroize_derive",
+]
+
+[[package]]
+name = "zeroize_derive"
+version = "1.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85a5b4158499876c763cb03bc4e49185d3cccbabb15b33c627f7884f43db852e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "zmij"
 version = "1.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1454,6 +1544,7 @@ serde_yaml  = "0.9"
 thiserror   = "1"
 anyhow      = "1"
 clap        = { version = "4",      features = ["derive", "env"] }
+cliclack    = "0.5.4"
 ratatui     = "0.27"
 crossterm   = { version = "0.27",   features = ["event-stream"] }
 tabled      = "0.15"
@@ -2851,6 +2942,7 @@ tracing.workspace     = true
 async-trait.workspace = true
 toml.workspace        = true
 serde_yaml.workspace  = true
+cliclack.workspace    = true
 
 ```
 
@@ -2859,13 +2951,43 @@ serde_yaml.workspace  = true
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use tokio::sync::mpsc;
+
 use crate::output::RenderFormat;
+
+// ── ProgressSender ────────────────────────────────────────────────────────────
+
+/// A cheap-to-clone handle for streaming progress lines back to the TUI while
+/// a handler is running. `None` when running in plain-CLI mode so all
+/// `.send()` calls are no-ops — handlers never have to branch on mode.
+#[derive(Clone, Default)]
+pub struct ProgressSender(Option<mpsc::UnboundedSender<String>>);
+
+impl ProgressSender {
+    /// Send a progress message. Silently drops the message if there is no
+    /// active TUI receiver (e.g. plain-CLI mode, or after the dispatch loop
+    /// has already finished).
+    pub fn send(&self, msg: impl Into<String>) {
+        if let Some(tx) = &self.0 {
+            let _ = tx.send(msg.into());
+        }
+    }
+
+    /// Returns `true` when there is an active TUI receiver.
+    pub fn is_active(&self) -> bool {
+        self.0.is_some()
+    }
+}
+
+// ── Ctx ───────────────────────────────────────────────────────────────────────
 
 /// Runtime context passed to every handler invocation.
 /// `Clone` is cheap — the inner data is reference-counted.
 #[derive(Clone)]
 pub struct Ctx {
-    inner: Arc<CtxInner>,
+    inner:    Arc<CtxInner>,
+    /// Live progress channel, injected by the TUI dispatch loop.
+    pub progress: ProgressSender,
 }
 
 struct CtxInner {
@@ -2877,7 +2999,8 @@ struct CtxInner {
 impl Ctx {
     pub fn new(format: RenderFormat, tui_mode: bool, flags: HashMap<String, String>) -> Self {
         Self {
-            inner: Arc::new(CtxInner { format, tui_mode, flags }),
+            inner:    Arc::new(CtxInner { format, tui_mode, flags }),
+            progress: ProgressSender::default(),
         }
     }
 
@@ -2892,7 +3015,16 @@ impl Ctx {
     pub fn flag(&self, key: &str) -> Option<&str> {
         self.inner.flags.get(key).map(|s| s.as_str())
     }
+
+    /// Return a clone of this `Ctx` with an active progress sender attached.
+    /// Called by the TUI dispatch loop immediately before invoking a handler.
+    pub fn with_progress(mut self, tx: mpsc::UnboundedSender<String>) -> Self {
+        self.progress = ProgressSender(Some(tx));
+        self
+    }
 }
+
+// ── CtxBuilder ────────────────────────────────────────────────────────────────
 
 /// Builder for constructing a `Ctx` before dispatch.
 #[derive(Default)]
@@ -2919,7 +3051,6 @@ impl CtxBuilder {
     }
 
     pub fn build(self) -> Ctx {
-        // Clean construction — no Arc::get_mut needed.
         Ctx::new(self.format, self.tui_mode, self.flags)
     }
 }
@@ -3422,12 +3553,13 @@ pub mod extract;
 pub mod handler;
 pub mod middleware;
 pub mod output;
+pub mod progress;
 pub mod router;
 pub mod schema;
 
 /// Convenient re-exports for handler implementors.
 pub mod prelude {
-    pub use crate::context::Ctx;
+    pub use crate::context::{Ctx, ProgressSender};
     pub use crate::error::{TkucliError, TkucliResult};
     pub use crate::extract::{ArgValue, FromArgs, Optional, ParsedArgs};
     pub use crate::handler::{
@@ -3436,6 +3568,7 @@ pub mod prelude {
     };
     pub use crate::middleware::{AuthLayer, ConfirmLayer, Layer, LoggingLayer, ServiceBuilder};
     pub use crate::output::{IntoOutput, Record, Render, RenderFormat, Success, Table};
+    pub use crate::progress::TaskSpinner;
     pub use crate::router::Router;
     pub use async_trait::async_trait;
 }
@@ -3823,6 +3956,79 @@ impl Render for Record {
 
 ```
 
+## File: src/tku-core/src/progress.rs
+```rs
+use crate::context::Ctx;
+
+/// A unified spinner that abstracts over plain-CLI (cliclack) and TUI
+/// (ctx.progress) mode.
+///
+/// Handlers create one spinner and call `start` / `update` / `stop` without
+/// ever branching on `ctx.tui_mode()` themselves — the right back-end is
+/// selected automatically.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// use tku_core::prelude::*;
+///
+/// async fn my_handler(ctx: Ctx, _args: MyArgs) -> TkucliResult<impl IntoOutput> {
+///     let spinner = TaskSpinner::start(&ctx, "Fetching data…");
+///     let result  = do_work().await?;
+///     spinner.stop("Done.");
+///     Ok(Success::new(result))
+/// }
+/// ```
+pub struct TaskSpinner<'a> {
+    ctx:     &'a Ctx,
+    spinner: Option<cliclack::ProgressBar>,
+}
+
+impl<'a> TaskSpinner<'a> {
+    /// Start a new spinner with an initial message.
+    ///
+    /// - In **plain-CLI** mode a `cliclack` spinner is shown in the terminal.
+    /// - In **TUI** mode the message is streamed to the TUI progress bubble
+    ///   via `ctx.progress`; no terminal spinner is created.
+    pub fn start(ctx: &'a Ctx, msg: &str) -> Self {
+        let spinner = if !ctx.tui_mode() {
+            let s = cliclack::spinner();
+            s.start(msg);
+            Some(s)
+        } else {
+            ctx.progress.send(msg);
+            None
+        };
+
+        Self { ctx, spinner }
+    }
+
+    /// Update the current spinner message.
+    ///
+    /// Always forwards to `ctx.progress` (a no-op in plain-CLI mode when there
+    /// is no active TUI receiver), and additionally updates the visible
+    /// cliclack spinner text in plain-CLI mode.
+    pub fn update(&self, msg: &str) {
+        self.ctx.progress.send(msg);
+
+        if let Some(s) = &self.spinner {
+            s.set_message(msg);
+        }
+    }
+
+    /// Stop the spinner and optionally leave a final message in the terminal.
+    ///
+    /// In TUI mode this is a no-op on the terminal side; the progress bubble
+    /// is cleared by the TUI dispatch loop once the handler returns.
+    pub fn stop(self, final_msg: &str) {
+        if let Some(s) = self.spinner {
+            s.stop(final_msg);
+        }
+    }
+}
+
+```
+
 ## File: src/tku-core/src/router.rs
 ```rs
 use crate::{
@@ -4177,7 +4383,7 @@ async-trait.workspace = true
 use crate::{
     extension::{PaletteItem, ScreenFactory, TuiBuildCtx, TuiExtension, TuiRegistry},
     events::{spawn_event_loop, AppEvent},
-    screen::{PaletteScreen, ResourceScreen, Screen, ScreenAction},
+    screen::{PaletteScreen, ResourceScreen, Screen, ScreenAction, ScreenLabels},
     theme::Theme,
     widgets::StatusBar,
 };
@@ -4198,18 +4404,16 @@ use tku_core::{
     schema::AppSchema,
 };
 use std::{collections::HashMap, io, sync::Arc};
+use tokio::sync::mpsc;
 
-/// The top-level TUI shell. Holds the screen stack, sidebar, and
-/// status bar. Drives the ratatui event loop.
 pub struct TuiApp {
-    theme:       Theme,
-    status_bar:  StatusBar,
+    theme:           Theme,
+    status_bar:      StatusBar,
     _custom_screens: HashMap<String, Arc<dyn ScreenFactory>>,
-    palette_items:  Vec<PaletteItem>,
-    service:     Arc<dyn CliService>,
-    ctx:         Ctx,
-    /// Stack of screens; the last element is the active one.
-    screen_stack: Vec<Box<dyn Screen>>,
+    palette_items:   Vec<PaletteItem>,
+    service:         Arc<dyn CliService>,
+    ctx:             Ctx,
+    screen_stack:    Vec<Box<dyn Screen>>,
 }
 
 pub struct TuiAppBuilder {
@@ -4218,20 +4422,22 @@ pub struct TuiAppBuilder {
     service:    Option<Arc<dyn CliService>>,
     ctx:        Option<Ctx>,
     extensions: Vec<Box<dyn TuiExtension>>,
+    /// Optional label overrides. Falls back to `ScreenLabels::default()`.
+    labels:     Option<ScreenLabels>,
 }
 
 impl TuiApp {
     pub fn new(
-        theme: Theme,
+        theme:          Theme,
         initial_screen: Box<dyn Screen>,
         custom_screens: HashMap<String, Arc<dyn ScreenFactory>>,
-        palette_items: Vec<PaletteItem>,
-        service: Arc<dyn CliService>,
-        ctx: Ctx,
+        palette_items:  Vec<PaletteItem>,
+        service:        Arc<dyn CliService>,
+        ctx:            Ctx,
     ) -> Self {
         Self {
             theme,
-            status_bar: StatusBar::new(),
+            status_bar:      StatusBar::new(),
             _custom_screens: custom_screens,
             palette_items,
             service,
@@ -4242,19 +4448,20 @@ impl TuiApp {
 
     pub fn builder() -> TuiAppBuilder {
         TuiAppBuilder {
-            theme: None,
-            schema: None,
-            service: None,
-            ctx: None,
+            theme:      None,
+            schema:     None,
+            service:    None,
+            ctx:        None,
             extensions: Vec::new(),
+            labels:     None,
         }
     }
 
     pub fn from_schema(
-        theme: Theme,
-        schema: &AppSchema,
+        theme:   Theme,
+        schema:  &AppSchema,
         service: Arc<dyn CliService>,
-        ctx: Ctx,
+        ctx:     Ctx,
     ) -> Self {
         Self::builder()
             .theme(theme)
@@ -4265,9 +4472,7 @@ impl TuiApp {
             .expect("TuiApp::from_schema requires a complete builder")
     }
 
-    /// Run the TUI event loop. Blocks until the user quits.
     pub async fn run(mut self) -> anyhow::Result<()> {
-        // Setup terminal.
         enable_raw_mode()?;
         let mut stdout = io::stdout();
         execute!(stdout, EnterAlternateScreen)?;
@@ -4277,22 +4482,8 @@ impl TuiApp {
         let mut events = spawn_event_loop(400);
 
         loop {
-            // Draw.
-            term.draw(|frame| {
-                let chunks = Layout::default()
-                    .direction(Direction::Vertical)
-                    .constraints([Constraint::Min(1), Constraint::Length(1)])
-                    .split(frame.size());
+            Self::draw_frame(&mut term, &mut self.screen_stack, &self.theme, &mut self.status_bar)?;
 
-                // Active screen
-                if let Some(screen) = self.screen_stack.last_mut() {
-                    screen.render(frame, chunks[0], &self.theme);
-                    let title = screen.title().to_owned();
-                    self.status_bar.render(frame, chunks[1], &self.theme, &title);
-                }
-            })?;
-
-            // Handle next event.
             let Some(event) = events.recv().await else { break };
 
             match &event {
@@ -4314,33 +4505,53 @@ impl TuiApp {
             match self.screen_stack.last_mut() {
                 Some(screen) => {
                     let action = screen.handle_event(&event);
-                    if self.apply_action(action).await { break; }
+                    if self.apply_action(action, &mut term, &mut events).await { break; }
                 }
                 None => break,
             }
         }
 
-        // Restore terminal.
         disable_raw_mode()?;
         execute!(term.backend_mut(), LeaveAlternateScreen)?;
         term.show_cursor()?;
         Ok(())
     }
 
-    /// Returns `true` if the app should quit.
-    async fn apply_action(&mut self, action: ScreenAction) -> bool {
+    fn draw_frame(
+        term:         &mut Terminal<CrosstermBackend<io::Stdout>>,
+        screen_stack: &mut Vec<Box<dyn Screen>>,
+        theme:        &Theme,
+        status_bar:   &mut StatusBar,
+    ) -> anyhow::Result<()> {
+        term.draw(|frame| {
+            let chunks = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([Constraint::Min(1), Constraint::Length(1)])
+                .split(frame.size());
+            if let Some(screen) = screen_stack.last_mut() {
+                screen.render(frame, chunks[0], theme);
+                let title = screen.title().to_owned();
+                status_bar.render(frame, chunks[1], theme, &title);
+            }
+        })?;
+        Ok(())
+    }
+
+    async fn apply_action(
+        &mut self,
+        action: ScreenAction,
+        term:   &mut Terminal<CrosstermBackend<io::Stdout>>,
+        events: &mut mpsc::UnboundedReceiver<AppEvent>,
+    ) -> bool {
         match action {
-            ScreenAction::None => false,
-            ScreenAction::Quit => true,
-            ScreenAction::Pop  => {
-                if self.screen_stack.len() > 1 {
-                    self.screen_stack.pop();
-                }
+            ScreenAction::None    => false,
+            ScreenAction::Quit    => true,
+            ScreenAction::Pop     => {
+                if self.screen_stack.len() > 1 { self.screen_stack.pop(); }
                 false
             }
             ScreenAction::Push(screen) => {
-                self.screen_stack.push(screen);
-                false
+                self.screen_stack.push(screen); false
             }
             ScreenAction::Replace(screen) => {
                 self.screen_stack.pop();
@@ -4348,10 +4559,8 @@ impl TuiApp {
                 false
             }
             ScreenAction::Dispatch { resource, verb, positional, flags } => {
-                if self
-                    .screen_stack
-                    .last()
-                    .map(|screen| !screen.prefers_inline_results())
+                if self.screen_stack.last()
+                    .map(|s| !s.prefers_inline_results())
                     .unwrap_or(false)
                     && self.screen_stack.len() > 1
                 {
@@ -4359,31 +4568,68 @@ impl TuiApp {
                 }
 
                 let command = format_command(&resource, &verb, &positional, &flags);
-                // For root operations hide the sentinel "$root" from user-visible labels.
                 let display_label = if resource == "$root" {
                     verb.clone()
                 } else {
                     format!("{resource} {verb}")
                 };
+
                 if let Some(screen) = self.screen_stack.last_mut() {
                     screen.append_command(command);
-                    screen.begin_pending(
-                        &display_label,
-                        "Running command...".to_string(),
-                    );
+                    screen.begin_pending(&display_label, "Running…".to_string());
                 }
-
                 self.status_bar.set(format!("Running {display_label}…"));
-                let mut args = ParsedArgs::new();
-                for value in positional {
-                    args.push(value);
-                }
-                for (key, value) in flags {
-                    args.insert(key, ArgValue::String(value));
-                }
 
-                let req = CliRequest::new(self.ctx.clone(), resource.clone(), verb.clone(), args);
-                match self.service.call(req).await {
+                let mut args = ParsedArgs::new();
+                for value in positional          { args.push(value); }
+                for (key, value) in flags        { args.insert(key, ArgValue::String(value)); }
+
+                let (progress_tx, mut progress_rx) = mpsc::unbounded_channel::<String>();
+                let req_ctx = self.ctx.clone().with_progress(progress_tx);
+                let req     = CliRequest::new(req_ctx, resource.clone(), verb.clone(), args);
+
+                let svc      = self.service.clone();
+                let mut task = tokio::spawn(async move { svc.call(req).await });
+
+                let result = loop {
+                    let _ = Self::draw_frame(
+                        term, &mut self.screen_stack, &self.theme, &mut self.status_bar,
+                    );
+
+                    tokio::select! {
+                        res = &mut task => {
+                            while let Ok(msg) = progress_rx.try_recv() {
+                                if let Some(screen) = self.screen_stack.last_mut() {
+                                    screen.update_pending_body(&msg);
+                                }
+                            }
+                            break res.unwrap_or_else(|e| Err(
+                                tku_core::error::TkucliError::Handler(
+                                    anyhow::anyhow!("task panicked: {e}")
+                                )
+                            ));
+                        }
+                        Some(msg) = progress_rx.recv() => {
+                            if let Some(screen) = self.screen_stack.last_mut() {
+                                screen.update_pending_body(&msg);
+                            }
+                        }
+                        Some(event) = events.recv() => {
+                            match &event {
+                                AppEvent::Quit => return true,
+                                AppEvent::Tick => {
+                                    if let Some(screen) = self.screen_stack.last_mut() {
+                                        screen.handle_event(&event);
+                                    }
+                                }
+                                AppEvent::Resize(_, _) => {}
+                                _ => {}
+                            }
+                        }
+                    }
+                };
+
+                match result {
                     Ok(output) => {
                         self.status_bar.set(format!("Completed {display_label}"));
                         let rendered = output.render(self.ctx.format());
@@ -4409,63 +4655,60 @@ impl TuiApp {
 }
 
 fn format_command(
-    resource: &str,
-    verb: &str,
+    resource:   &str,
+    verb:       &str,
     positional: &[String],
-    flags: &HashMap<String, String>,
+    flags:      &HashMap<String, String>,
 ) -> String {
-    // For root operations omit the internal "$root" sentinel so the history shows just the verb.
     let mut parts = if resource == "$root" {
         vec![verb.to_string()]
     } else {
         vec![resource.to_string(), verb.to_string()]
     };
     parts.extend(positional.iter().cloned());
-
-    let mut flag_parts: Vec<String> = flags
-        .iter()
-        .map(|(key, value)| format!("--{key} {value}"))
-        .collect();
+    let mut flag_parts: Vec<String> =
+        flags.iter().map(|(k, v)| format!("--{k} {v}")).collect();
     flag_parts.sort();
     parts.extend(flag_parts);
-
     parts.join(" ")
 }
 
 impl TuiAppBuilder {
     pub fn theme(mut self, theme: Theme) -> Self {
-        self.theme = Some(theme);
-        self
+        self.theme = Some(theme); self
     }
-
     pub fn schema(mut self, schema: AppSchema) -> Self {
-        self.schema = Some(schema);
-        self
+        self.schema = Some(schema); self
     }
-
     pub fn service(mut self, service: Arc<dyn CliService>) -> Self {
-        self.service = Some(service);
-        self
+        self.service = Some(service); self
     }
-
     pub fn ctx(mut self, ctx: Ctx) -> Self {
-        self.ctx = Some(ctx);
-        self
+        self.ctx = Some(ctx); self
+    }
+    pub fn extension<E: TuiExtension + 'static>(mut self, extension: E) -> Self {
+        self.extensions.push(Box::new(extension)); self
     }
 
-    pub fn extension<E>(mut self, extension: E) -> Self
-    where
-        E: TuiExtension + 'static,
-    {
-        self.extensions.push(Box::new(extension));
-        self
+    /// Override the default `"running"` / `"latest"` header labels.
+    ///
+    /// ```rust,ignore
+    /// TuiApp::builder()
+    ///     .labels(ScreenLabels {
+    ///         running: "working…".to_string(),
+    ///         latest:  "done".to_string(),
+    ///     })
+    /// ```
+    pub fn labels(mut self, labels: ScreenLabels) -> Self {
+        self.labels = Some(labels); self
     }
 
     pub fn build(self) -> anyhow::Result<TuiApp> {
-        let theme = self.theme.ok_or_else(|| anyhow::anyhow!("missing theme"))?;
-        let schema = self.schema.ok_or_else(|| anyhow::anyhow!("missing schema"))?;
+        let theme   = self.theme  .ok_or_else(|| anyhow::anyhow!("missing theme"))?;
+        let schema  = self.schema .ok_or_else(|| anyhow::anyhow!("missing schema"))?;
         let service = self.service.ok_or_else(|| anyhow::anyhow!("missing service"))?;
-        let ctx = self.ctx.ok_or_else(|| anyhow::anyhow!("missing context"))?;
+        let ctx     = self.ctx    .ok_or_else(|| anyhow::anyhow!("missing context"))?;
+        let labels  = self.labels.unwrap_or_default();
 
         let mut registry = TuiRegistry::new();
         for extension in self.extensions {
@@ -4486,10 +4729,12 @@ impl TuiAppBuilder {
         let initial_screen = if let Some(default_screen) = default_screen.as_deref() {
             match custom_screens.get(default_screen) {
                 Some(factory) => factory.build(&build_ctx),
-                None => ResourceScreen::from_app_schema(&schema, Some(default_screen)),
+                None => ResourceScreen::from_app_schema_with_labels(
+                    &schema, Some(default_screen), labels.clone(),
+                ),
             }
         } else {
-            ResourceScreen::from_app_schema(&schema, None)
+            ResourceScreen::from_app_schema_with_labels(&schema, None, labels.clone())
         };
 
         Ok(TuiApp::new(
@@ -4699,79 +4944,92 @@ use tku_core::schema::{AppSchema, OperationSchema, ResourceSchema};
 use ratatui::{layout::Rect, Frame};
 use std::collections::HashMap;
 
+// ── ScreenLabels ─────────────────────────────────────────────────────────────
+
+/// Customisable text labels rendered in the transcript bubble header.
+///
+/// Pass this to [`TuiAppBuilder::labels`] to override the defaults.
+///
+/// ```rust,ignore
+/// TuiApp::builder()
+///     // ...
+///     .labels(ScreenLabels {
+///         running: "working…".to_string(),
+///         latest:  "done".to_string(),
+///     })
+/// ```
+#[derive(Clone)]
+pub struct ScreenLabels {
+    /// Text shown next to the spinner glyph while a command is in-flight.
+    /// Default: `"running"`
+    pub running: String,
+    /// Text shown on the most-recently-completed (non-pending) entry.
+    /// Default: `"latest"`
+    pub latest: String,
+}
+
+impl Default for ScreenLabels {
+    fn default() -> Self {
+        Self {
+            running: "running".to_string(),
+            latest:  "latest".to_string(),
+        }
+    }
+}
+
+// ── Screen trait ─────────────────────────────────────────────────────────────
+
 /// Every TUI screen (resource list, detail view, form, dashboard…)
 /// implements this trait. The `TuiApp` shell calls `render` and
 /// `handle_event` on the currently active screen.
 pub trait Screen: Send {
-    /// Draw the screen onto the given `Frame` area.
     fn render(&mut self, frame: &mut Frame, area: Rect, theme: &Theme);
-
-    /// Handle an input event. Returns a `ScreenAction` telling the
-    /// shell what to do next.
     fn handle_event(&mut self, event: &AppEvent) -> ScreenAction;
-
-    /// Human-readable name shown in the status bar.
     fn title(&self) -> &str;
 
-    /// Whether this screen wants command/results appended inline.
-    fn prefers_inline_results(&self) -> bool {
-        false
-    }
-
-    /// Append a command line to the active transcript, if supported.
+    fn prefers_inline_results(&self) -> bool { false }
     fn append_command(&mut self, _command: String) {}
-
-    /// Append a result block to the active transcript, if supported.
     fn append_result(&mut self, _title: &str, _body: String, _ok: bool) {}
-
-    /// Insert a pending block for a command that has started running.
     fn begin_pending(&mut self, _title: &str, _body: String) {}
-
-    /// Resolve the active pending block into a final state.
     fn resolve_pending(&mut self, title: &str, body: String, ok: bool) {
         self.append_result(title, body, ok);
     }
+    fn update_pending_body(&mut self, _msg: &str) {}
 }
 
-/// What the shell should do after `handle_event` returns.
-///
-/// Note: no #[derive(Debug)] — Box<dyn Screen> doesn't implement Debug.
-/// Use the intentional manual impl below if you need debug output.
+// ── ScreenAction ─────────────────────────────────────────────────────────────
+
 pub enum ScreenAction {
-    /// Stay on the current screen.
     None,
-    /// Push a new screen onto the stack.
     Push(Box<dyn Screen>),
-    /// Pop back to the previous screen.
     Pop,
-    /// Replace the current screen.
     Replace(Box<dyn Screen>),
-    /// Exit the TUI entirely.
     Quit,
-    /// Run a resource operation and display the result.
-    /// Args are carried as a plain HashMap — tku-tui has no serde_json dep.
-    /// The router layer converts them into ParsedArgs.
     Dispatch {
-        resource: String,
-        verb:     String,
+        resource:   String,
+        verb:       String,
         positional: Vec<String>,
-        flags:    HashMap<String, String>,
+        flags:      HashMap<String, String>,
     },
 }
 
+// ── ResourceScreen ────────────────────────────────────────────────────────────
+
 #[derive(Clone)]
 pub struct ResourceScreen {
-    resources: Vec<TuiResource>,
-    selected_resource: usize,
+    resources:          Vec<TuiResource>,
+    selected_resource:  usize,
     selected_operation: usize,
-    composer: Option<ComposerState>,
-    prompt_message: Option<String>,
-    transcript: Vec<TranscriptEntry>,
-    scroll: u16,
-    content_lines: u16,
-    viewport_lines: u16,
-    auto_follow: bool,
-    pending_entry: Option<usize>,
+    composer:           Option<ComposerState>,
+    prompt_message:     Option<String>,
+    transcript:         Vec<TranscriptEntry>,
+    scroll:             u16,
+    content_lines:      u16,
+    viewport_lines:     u16,
+    auto_follow:        bool,
+    pending_entry:      Option<usize>,
+    /// Customisable header labels — set via [`TuiAppBuilder::labels`].
+    labels:             ScreenLabels,
 }
 
 #[derive(Clone)]
@@ -4783,33 +5041,44 @@ pub struct TuiResource {
 
 #[derive(Clone)]
 pub struct TuiOperation {
-    pub verb:        String,
-    pub description: String,
+    pub verb:            String,
+    pub description:     String,
     pub positional_args: Vec<String>,
-    pub default_flags: HashMap<String, String>,
-    pub required_flags: Vec<String>,
+    pub default_flags:   HashMap<String, String>,
+    pub required_flags:  Vec<String>,
 }
 
 #[derive(Clone, Default)]
 struct ComposerState {
-    buffer: String,
+    buffer:         String,
     cursor_visible: bool,
 }
 
 #[derive(Clone)]
 struct TranscriptEntry {
-    role: TranscriptRole,
-    title: Option<String>,
-    body: String,
-    pending: bool,
+    role:          TranscriptRole,
+    title:         Option<String>,
+    body:          String,
+    pending:       bool,
     pending_frame: usize,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum TranscriptRole {
-    User,
-    Assistant,
-    System,
+enum TranscriptRole { User, Assistant, System }
+
+fn welcome_entry() -> TranscriptEntry {
+    TranscriptEntry {
+        role:  TranscriptRole::System,
+        title: Some("tkucli".to_string()),
+        body:  "Welcome to Tkucli TUI.\n\n\
+                1. Move through actions below with j/k or the arrow keys.\n\
+                2. Press Enter to run the selected action.\n\
+                3. Results will appear here in the same conversation.\n\
+                4. Use Ctrl-U / Ctrl-D or PageUp / PageDown to scroll through history."
+            .to_string(),
+        pending:       false,
+        pending_frame: 0,
+    }
 }
 
 impl TuiResource {
@@ -4821,33 +5090,28 @@ impl TuiResource {
         let mut path = parent_path.to_vec();
         path.push(resource.name.clone());
         Self {
-            name: path.join("."),
+            name:        path.join("."),
             description: resource.description.clone(),
-            operations: resource
-                .operations
-                .iter()
-                .map(TuiOperation::from_schema)
-                .collect(),
+            operations:  resource.operations.iter().map(TuiOperation::from_schema).collect(),
         }
     }
 }
 
 impl TuiOperation {
     fn from_schema(op: &OperationSchema) -> Self {
-        let positional_args: Vec<String> = op.args.iter().map(|arg| arg.name.clone()).collect();
+        let positional_args: Vec<String> =
+            op.args.iter().map(|arg| arg.name.clone()).collect();
         let default_flags: HashMap<String, String> = op
             .flags
             .iter()
-            .filter_map(|flag| flag.default.as_ref().map(|value| (flag.name.clone(), value.clone())))
+            .filter_map(|f| f.default.as_ref().map(|v| (f.name.clone(), v.clone())))
             .collect();
-
         let required_flags: Vec<String> = op
             .flags
             .iter()
-            .filter(|flag| flag.required && flag.default.is_none())
-            .map(|flag| flag.name.clone())
+            .filter(|f| f.required && f.default.is_none())
+            .map(|f| f.name.clone())
             .collect();
-
         Self {
             verb: op.verb.clone(),
             description: op.description.clone(),
@@ -4861,45 +5125,49 @@ impl TuiOperation {
 impl ResourceScreen {
     pub fn new(resource: TuiResource) -> Self {
         Self {
-            resources: vec![resource],
-            selected_resource: 0,
+            resources:          vec![resource],
+            selected_resource:  0,
             selected_operation: 0,
-            composer: None,
-            prompt_message: None,
-            transcript: vec![TranscriptEntry {
-                role: TranscriptRole::System,
-                title: Some("tkucli".to_string()),
-                body: "Welcome to Tkucli TUI.\n\n1. Move through actions below with j/k or the arrow keys.\n2. Press Enter to run the selected action.\n3. Results will appear here in the same conversation.\n4. Use Ctrl-U / Ctrl-D or PageUp / PageDown to scroll through history.".to_string(),
-                pending: false,
-                pending_frame: 0,
-            }],
-            scroll: 0,
-            content_lines: 0,
-            viewport_lines: 0,
-            auto_follow: true,
-            pending_entry: None,
+            composer:           None,
+            prompt_message:     None,
+            transcript:         vec![welcome_entry()],
+            scroll:             0,
+            content_lines:      0,
+            viewport_lines:     0,
+            auto_follow:        true,
+            pending_entry:      None,
+            labels:             ScreenLabels::default(),
         }
     }
 
+    /// Override the default header labels. Chains before boxing:
+    /// `ResourceScreen::new(r).with_labels(labels)`
+    pub fn with_labels(mut self, labels: ScreenLabels) -> Self {
+        self.labels = labels;
+        self
+    }
+
     pub fn from_resources(resources: Vec<TuiResource>) -> Box<dyn Screen> {
+        Self::from_resources_with_labels(resources, ScreenLabels::default())
+    }
+
+    pub fn from_resources_with_labels(
+        resources: Vec<TuiResource>,
+        labels:    ScreenLabels,
+    ) -> Box<dyn Screen> {
         Box::new(Self {
             resources,
-            selected_resource: 0,
+            selected_resource:  0,
             selected_operation: 0,
-            composer: None,
-            prompt_message: None,
-            transcript: vec![TranscriptEntry {
-                role: TranscriptRole::System,
-                title: Some("tkucli".to_string()),
-                body: "Welcome to Tkucli TUI.\n\n1. Move through actions below with j/k or the arrow keys.\n2. Press Enter to run the selected action.\n3. Results will appear here in the same conversation.\n4. Use Ctrl-U / Ctrl-D or PageUp / PageDown to scroll through history.".to_string(),
-                pending: false,
-                pending_frame: 0,
-            }],
-            scroll: 0,
-            content_lines: 0,
-            viewport_lines: 0,
-            auto_follow: true,
-            pending_entry: None,
+            composer:           None,
+            prompt_message:     None,
+            transcript:         vec![welcome_entry()],
+            scroll:             0,
+            content_lines:      0,
+            viewport_lines:     0,
+            auto_follow:        true,
+            pending_entry:      None,
+            labels,
         })
     }
 
@@ -4908,14 +5176,22 @@ impl ResourceScreen {
     }
 
     pub fn from_app_schema(schema: &AppSchema, resource_name: Option<&str>) -> Box<dyn Screen> {
+        Self::from_app_schema_with_labels(schema, resource_name, ScreenLabels::default())
+    }
+
+    /// Primary constructor used by `TuiAppBuilder` — accepts custom labels.
+    pub fn from_app_schema_with_labels(
+        schema:        &AppSchema,
+        resource_name: Option<&str>,
+        labels:        ScreenLabels,
+    ) -> Box<dyn Screen> {
         let mut resources = Vec::new();
 
-        // Prepend root operations as a synthetic TuiResource (dispatches as "$root").
         if !schema.root.operations.is_empty() {
             resources.push(TuiResource {
-                name: "$root".to_string(),
+                name:        "$root".to_string(),
                 description: "top-level commands".to_string(),
-                operations: schema
+                operations:  schema
                     .root
                     .operations
                     .iter()
@@ -4927,12 +5203,10 @@ impl ResourceScreen {
         for resource in &schema.resources {
             collect_tui_resources(resource, &mut Vec::new(), &mut resources);
         }
+
         let resources: Vec<TuiResource> = match resource_name {
-            Some(name) => resources
-                .into_iter()
-                .filter(|resource| resource.name == name)
-                .collect(),
-            None => resources,
+            Some(name) => resources.into_iter().filter(|r| r.name == name).collect(),
+            None       => resources,
         };
 
         if resources.is_empty() {
@@ -4941,14 +5215,16 @@ impl ResourceScreen {
                 "This app has no resources configured in cli.toml.",
             )
         } else {
-            Self::from_resources(resources)
+            Self::from_resources_with_labels(resources, labels)
         }
     }
+
+    // ── private helpers ───────────────────────────────────────────────────────
 
     fn current_operation(&self) -> Option<&TuiOperation> {
         self.resources
             .get(self.selected_resource)
-            .and_then(|resource| resource.operations.get(self.selected_operation))
+            .and_then(|r| r.operations.get(self.selected_operation))
     }
 
     fn current_resource(&self) -> Option<&TuiResource> {
@@ -4960,44 +5236,34 @@ impl ResourceScreen {
             .resources
             .iter()
             .enumerate()
-            .flat_map(|(resource_idx, resource)| {
-                resource
-                    .operations
-                    .iter()
-                    .enumerate()
-                    .map(move |(operation_idx, _)| (resource_idx, operation_idx))
-            })
+            .flat_map(|(ri, r)| r.operations.iter().enumerate().map(move |(oi, _)| (ri, oi)))
             .collect();
 
-        if selectable.is_empty() {
-            return;
-        }
+        if selectable.is_empty() { return; }
 
         let current = selectable
             .iter()
-            .position(|(resource_idx, operation_idx)| {
-                *resource_idx == self.selected_resource && *operation_idx == self.selected_operation
-            })
+            .position(|(ri, oi)| *ri == self.selected_resource && *oi == self.selected_operation)
             .unwrap_or(0);
 
-        let len = selectable.len() as isize;
+        let len  = selectable.len() as isize;
         let next = (current as isize + delta).rem_euclid(len) as usize;
-        let (resource_idx, operation_idx) = selectable[next];
-        self.selected_resource = resource_idx;
-        self.selected_operation = operation_idx;
-        self.composer = None;
-        self.prompt_message = None;
+        let (ri, oi)            = selectable[next];
+        self.selected_resource  = ri;
+        self.selected_operation = oi;
+        self.composer           = None;
+        self.prompt_message     = None;
     }
 
     fn scroll_by(&mut self, delta: i16) {
-        let max_scroll = self.content_lines.saturating_sub(self.viewport_lines);
-        let next = self.scroll as i32 + delta as i32;
-        self.scroll = next.clamp(0, max_scroll as i32) as u16;
+        let max_scroll   = self.content_lines.saturating_sub(self.viewport_lines);
+        let next         = self.scroll as i32 + delta as i32;
+        self.scroll      = next.clamp(0, max_scroll as i32) as u16;
         self.auto_follow = self.scroll >= max_scroll;
     }
 
     fn scroll_to_bottom(&mut self) {
-        self.scroll = self.content_lines.saturating_sub(self.viewport_lines);
+        self.scroll      = self.content_lines.saturating_sub(self.viewport_lines);
         self.auto_follow = true;
     }
 
@@ -5009,13 +5275,9 @@ impl ResourceScreen {
 
     fn prompt_label(&self) -> String {
         match (self.current_resource(), self.current_operation()) {
-            (Some(resource), Some(op)) => {
-                // "$root" is an internal sentinel — show just the verb for root commands.
-                if resource.name == "$root" {
-                    format!("> {}", op.verb)
-                } else {
-                    format!("> {} {}", resource.name, op.verb)
-                }
+            (Some(r), Some(op)) => {
+                if r.name == "$root" { format!("> {}", op.verb) }
+                else                 { format!("> {} {}", r.name, op.verb) }
             }
             _ => "> select an action".to_string(),
         }
@@ -5025,61 +5287,48 @@ impl ResourceScreen {
         match self.current_operation() {
             Some(op) => {
                 let mut parts = Vec::new();
-                for arg in &op.positional_args {
-                    parts.push(format!("<{}>", arg));
-                }
-                for flag in &op.required_flags {
-                    parts.push(format!("{}=<value>", flag));
-                }
-                if parts.is_empty() {
-                    "ready".to_string()
-                } else {
-                    parts.join(" ")
-                }
+                for arg  in &op.positional_args { parts.push(format!("<{}>", arg)); }
+                for flag in &op.required_flags  { parts.push(format!("{}=<value>", flag)); }
+                if parts.is_empty() { "ready".to_string() } else { parts.join(" ") }
             }
             None => "no action selected".to_string(),
         }
     }
 
     fn build_dispatch(&self, input: &str) -> Result<ScreenAction, String> {
-        let resource = self
-            .current_resource()
+        let resource = self.current_resource()
             .ok_or_else(|| "no resource selected".to_string())?;
-        let op = self
-            .current_operation()
+        let op = self.current_operation()
             .ok_or_else(|| "no operation selected".to_string())?;
 
         let mut positional = Vec::new();
-        let mut flags = op.default_flags.clone();
+        let mut flags      = op.default_flags.clone();
 
         if !input.trim().is_empty() {
             let tokens: Vec<&str> = input.split_whitespace().collect();
-            let mut token_index = 0;
+            let mut ti = 0;
 
             for arg_name in &op.positional_args {
-                let token = tokens
-                    .get(token_index)
+                let token = tokens.get(ti)
                     .ok_or_else(|| format!("missing positional argument `{}`", arg_name))?;
                 if token.contains('=') {
                     return Err(format!("expected positional `{}`, got flag-style input", arg_name));
                 }
                 positional.push((*token).to_string());
-                token_index += 1;
+                ti += 1;
             }
 
-            let remaining = &tokens[token_index..];
+            let remaining = &tokens[ti..];
             if op.required_flags.len() == 1
-                && !remaining.is_empty()
                 && remaining.len() == 1
                 && !remaining[0].contains('=')
             {
                 flags.insert(op.required_flags[0].clone(), remaining[0].to_string());
             } else {
                 for token in remaining {
-                    let (key, value) = token
-                        .split_once('=')
+                    let (k, v) = token.split_once('=')
                         .ok_or_else(|| format!("expected key=value input, got `{}`", token))?;
-                    flags.insert(key.to_string(), value.to_string());
+                    flags.insert(k.to_string(), v.to_string());
                 }
             }
         }
@@ -5091,76 +5340,64 @@ impl ResourceScreen {
         }
 
         Ok(ScreenAction::Dispatch {
-            resource: resource.name.clone(),
-            verb: op.verb.clone(),
+            resource:   resource.name.clone(),
+            verb:       op.verb.clone(),
             positional,
             flags,
         })
     }
 
     fn push_bubble_lines(
-        lines: &mut Vec<ratatui::text::Line<'static>>,
-        entry: &TranscriptEntry,
-        theme: &Theme,
+        lines:     &mut Vec<ratatui::text::Line<'static>>,
+        entry:     &TranscriptEntry,
+        theme:     &Theme,
         is_latest: bool,
+        labels:    &ScreenLabels,
     ) {
-        use ratatui::{
-            style::Style,
-            text::{Line, Span},
-        };
+        use ratatui::{style::Style, text::{Line, Span}};
 
         let (label, label_style, body_style, faded_body_style) = match entry.role {
             TranscriptRole::User => (
-                "you",
-                theme.selected_style(),
-                Style::default().fg(theme.text),
-                theme.dim_style(),
+                "you", theme.selected_style(),
+                Style::default().fg(theme.text), theme.dim_style(),
             ),
             TranscriptRole::Assistant => (
-                "tkucli",
-                theme.accent_style(),
-                Style::default().fg(theme.text),
-                theme.dim_style(),
+                "tkucli", theme.accent_style(),
+                Style::default().fg(theme.text), theme.dim_style(),
             ),
             TranscriptRole::System => (
-                "system",
-                theme.dim_style(),
-                theme.dim_style(),
-                theme.dim_style(),
+                "system", theme.dim_style(), theme.dim_style(), theme.dim_style(),
             ),
         };
+
         let active_border_style = if is_latest {
             match entry.role {
-                TranscriptRole::User => theme.selected_style(),
+                TranscriptRole::User      => theme.selected_style(),
                 TranscriptRole::Assistant => theme.accent_style(),
-                TranscriptRole::System => theme.title_style(),
+                TranscriptRole::System    => theme.title_style(),
             }
         } else {
             theme.border_style()
         };
+
         let body_prefix = if is_latest { "▌ " } else { "│ " };
-        let status_tag = if entry.pending {
-            "running"
+
+        const SPINNER_FRAMES: [&str; 10] =
+            ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+        // Use developer-supplied labels instead of hardcoded strings.
+        let status_tag: String = if entry.pending {
+            let frame = SPINNER_FRAMES[entry.pending_frame % SPINNER_FRAMES.len()];
+            format!("{} {}", frame, labels.running)
         } else if is_latest {
-            "latest"
+            labels.latest.clone()
         } else {
-            ""
+            String::new()
         };
-        let title_style = if is_latest {
-            Style::default().fg(theme.text_title)
-        } else {
-            theme.dim_style()
-        };
-        let rendered_label_style = if is_latest {
-            label_style
-        } else {
-            theme.dim_style()
-        };
-        let rendered_body_style = if is_latest {
-            body_style
-        } else {
-            faded_body_style
-        };
+
+        let title_style          = if is_latest { Style::default().fg(theme.text_title) } else { theme.dim_style() };
+        let rendered_label_style = if is_latest { label_style } else { theme.dim_style() };
+        let rendered_body_style  = if is_latest { body_style  } else { faded_body_style  };
 
         let mut header = vec![
             Span::styled("  ", Style::default()),
@@ -5173,12 +5410,8 @@ impl ResourceScreen {
         }
         if !status_tag.is_empty() {
             header.push(Span::styled("  ", Style::default()));
-            let tag_style = if entry.pending {
-                theme.success_style()
-            } else {
-                theme.accent_style()
-            };
-            header.push(Span::styled(status_tag.to_string(), tag_style));
+            let tag_style = if entry.pending { theme.success_style() } else { theme.accent_style() };
+            header.push(Span::styled(status_tag, tag_style));
         }
         lines.push(Line::from(header));
 
@@ -5199,16 +5432,16 @@ impl ResourceScreen {
 
     fn has_pending(&self) -> bool {
         self.pending_entry
-            .and_then(|index| self.transcript.get(index))
-            .map(|entry| entry.pending)
+            .and_then(|i| self.transcript.get(i))
+            .map(|e| e.pending)
             .unwrap_or(false)
     }
 }
 
 fn collect_tui_resources(
-    resource: &ResourceSchema,
+    resource:    &ResourceSchema,
     parent_path: &mut Vec<String>,
-    out: &mut Vec<TuiResource>,
+    out:         &mut Vec<TuiResource>,
 ) {
     parent_path.push(resource.name.clone());
     out.push(TuiResource::from_schema_path(resource, &parent_path[..parent_path.len() - 1]));
@@ -5218,20 +5451,15 @@ fn collect_tui_resources(
     parent_path.pop();
 }
 
-impl Screen for ResourceScreen {
-    fn title(&self) -> &str {
-        "Tkucli"
-    }
+// ── Screen impl for ResourceScreen ───────────────────────────────────────────
 
-    fn prefers_inline_results(&self) -> bool {
-        true
-    }
+impl Screen for ResourceScreen {
+    fn title(&self) -> &str { "Tkucli" }
+    fn prefers_inline_results(&self) -> bool { true }
 
     fn append_command(&mut self, command: String) {
-        if self
-            .transcript
-            .first()
-            .map(|entry| entry.role == TranscriptRole::System && entry.title.as_deref() == Some("tkucli"))
+        if self.transcript.first()
+            .map(|e| e.role == TranscriptRole::System && e.title.as_deref() == Some("tkucli"))
             .unwrap_or(false)
             && self.transcript.len() == 1
         {
@@ -5239,71 +5467,55 @@ impl Screen for ResourceScreen {
             self.pending_entry = None;
         }
         self.transcript.push(TranscriptEntry {
-            role: TranscriptRole::User,
-            title: None,
-            body: command,
-            pending: false,
-            pending_frame: 0,
+            role: TranscriptRole::User, title: None, body: command,
+            pending: false, pending_frame: 0,
         });
-        if self.auto_follow {
-            self.scroll_to_bottom();
-        }
+        if self.auto_follow { self.scroll_to_bottom(); }
     }
 
     fn append_result(&mut self, title: &str, body: String, ok: bool) {
-        let role = if ok {
-            TranscriptRole::Assistant
-        } else {
-            TranscriptRole::System
-        };
+        let role = if ok { TranscriptRole::Assistant } else { TranscriptRole::System };
         self.transcript.push(TranscriptEntry {
-            role,
-            title: Some(title.to_string()),
-            body,
-            pending: false,
-            pending_frame: 0,
+            role, title: Some(title.to_string()), body,
+            pending: false, pending_frame: 0,
         });
-        if self.auto_follow {
-            self.scroll_to_bottom();
-        }
+        if self.auto_follow { self.scroll_to_bottom(); }
     }
 
     fn begin_pending(&mut self, title: &str, body: String) {
         self.transcript.push(TranscriptEntry {
-            role: TranscriptRole::Assistant,
-            title: Some(title.to_string()),
-            body,
-            pending: true,
-            pending_frame: 0,
+            role: TranscriptRole::Assistant, title: Some(title.to_string()), body,
+            pending: true, pending_frame: 0,
         });
         self.pending_entry = Some(self.transcript.len() - 1);
-        if self.auto_follow {
-            self.scroll_to_bottom();
-        }
+        if self.auto_follow { self.scroll_to_bottom(); }
     }
 
     fn resolve_pending(&mut self, title: &str, body: String, ok: bool) {
-        let role = if ok {
-            TranscriptRole::Assistant
-        } else {
-            TranscriptRole::System
-        };
-
+        let role = if ok { TranscriptRole::Assistant } else { TranscriptRole::System };
         if let Some(index) = self.pending_entry.take() {
             if let Some(entry) = self.transcript.get_mut(index) {
-                entry.role = role;
-                entry.title = Some(title.to_string());
-                entry.body = body;
-                entry.pending = false;
+                entry.role          = role;
+                entry.title         = Some(title.to_string());
+                entry.body          = body;
+                entry.pending       = false;
                 entry.pending_frame = 0;
-                if self.auto_follow {
-                    self.scroll_to_bottom();
-                }
+                if self.auto_follow { self.scroll_to_bottom(); }
                 return;
             }
         }
-
         self.append_result(title, body, ok);
+    }
+
+    fn update_pending_body(&mut self, msg: &str) {
+        if let Some(index) = self.pending_entry {
+            if let Some(entry) = self.transcript.get_mut(index) {
+                if entry.pending {
+                    entry.body = msg.to_string();
+                    if self.auto_follow { self.scroll_to_bottom(); }
+                }
+            }
+        }
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
@@ -5334,121 +5546,70 @@ impl Screen for ResourceScreen {
             Line::from("Resources live in the main thread so you can browse and act without a sidebar."),
         ]))
         .wrap(Wrap { trim: true })
-        .block(
-            Block::default()
-                .title(" Session ")
-                .borders(Borders::ALL)
-                .border_style(theme.border_style())
-                .title_style(theme.title_style())
-                .style(Style::default().bg(theme.bg_secondary)),
-        )
+        .block(Block::default().title(" Session ").borders(Borders::ALL)
+            .border_style(theme.border_style()).title_style(theme.title_style())
+            .style(Style::default().bg(theme.bg_secondary)))
         .style(Style::default().fg(theme.text));
         frame.render_widget(intro, chunks[0]);
 
-        let transcript_block = Block::default()
-            .title(" Conversation ")
-            .borders(Borders::ALL)
-            .border_style(theme.border_focus_style())
-            .title_style(theme.title_style())
+        let transcript_block = Block::default().title(" Conversation ").borders(Borders::ALL)
+            .border_style(theme.border_focus_style()).title_style(theme.title_style())
             .style(Style::default().bg(theme.bg));
         let transcript_inner = transcript_block.inner(chunks[1]);
         frame.render_widget(transcript_block, chunks[1]);
 
         let mut lines: Vec<Line<'static>> = Vec::new();
-
         let latest_index = self.transcript.len().saturating_sub(1);
         for (idx, entry) in self.transcript.iter().enumerate() {
-            Self::push_bubble_lines(&mut lines, entry, theme, idx == latest_index);
+            Self::push_bubble_lines(&mut lines, entry, theme, idx == latest_index, &self.labels);
         }
 
         self.content_lines = lines.len().min(u16::MAX as usize) as u16;
-        if self.auto_follow {
-            self.scroll_to_bottom();
-        }
+        if self.auto_follow { self.scroll_to_bottom(); }
 
-        let list = Paragraph::new(Text::from(lines))
-            .wrap(Wrap { trim: true })
-            .scroll((self.scroll, 0))
-            .style(Style::default().fg(theme.text));
-        frame.render_widget(list, transcript_inner.inner(Margin { horizontal: 1, vertical: 1 }));
+        frame.render_widget(
+            Paragraph::new(Text::from(lines)).wrap(Wrap { trim: true })
+                .scroll((self.scroll, 0)).style(Style::default().fg(theme.text)),
+            transcript_inner.inner(Margin { horizontal: 1, vertical: 1 }),
+        );
 
-        let actions_block = Block::default()
-            .title(" Actions ")
-            .borders(Borders::ALL)
-            .border_style(if self.has_pending() {
-                theme.border_style()
-            } else {
-                theme.border_style()
-            })
-            .title_style(theme.title_style())
+        let actions_block = Block::default().title(" Actions ").borders(Borders::ALL)
+            .border_style(theme.border_style()).title_style(theme.title_style())
             .style(Style::default().bg(theme.bg_secondary));
         let actions_inner = actions_block.inner(chunks[2]);
         frame.render_widget(actions_block, chunks[2]);
 
-        let mut action_lines = Vec::new();
-        let actions_dimmed = self.has_pending();
-        let mut selected_row = None;
+        let mut action_lines  = Vec::new();
+        let actions_dimmed    = self.has_pending();
+        let mut selected_row  = None;
+
         if self.resources.is_empty() {
-            action_lines.push(Line::from(Span::styled(
-                "No operations available",
-                theme.dim_style(),
-            )));
+            action_lines.push(Line::from(Span::styled("No operations available", theme.dim_style())));
         } else {
             for (resource_idx, resource) in self.resources.iter().enumerate() {
-                let display_name = if resource.name == "$root" {
-                    "root"
-                } else {
-                    resource.name.as_str()
-                };
+                let display_name = if resource.name == "$root" { "root" } else { resource.name.as_str() };
                 action_lines.push(Line::from(vec![
-                    Span::styled(
-                        display_name,
-                        if actions_dimmed {
-                            theme.dim_style()
-                        } else {
-                            Style::default().fg(theme.text_title)
-                        },
-                    ),
-                    Span::styled(
-                        format!("  {}", resource.description),
-                        theme.dim_style(),
-                    ),
+                    Span::styled(display_name,
+                        if actions_dimmed { theme.dim_style() } else { Style::default().fg(theme.text_title) }),
+                    Span::styled(format!("  {}", resource.description), theme.dim_style()),
                 ]));
 
                 if resource.operations.is_empty() {
-                    action_lines.push(Line::from(Span::styled(
-                        "  No operations configured",
-                        theme.dim_style(),
-                    )));
+                    action_lines.push(Line::from(Span::styled("  No operations configured", theme.dim_style())));
                 } else {
                     for (operation_idx, op) in resource.operations.iter().enumerate() {
-                        let selected =
-                            resource_idx == self.selected_resource && operation_idx == self.selected_operation;
-                        if selected {
-                            selected_row = Some(action_lines.len());
-                        }
-                        let prefix = if selected { "›" } else { " " };
-                        let pill_style = if actions_dimmed {
-                            theme.dim_style()
-                        } else if selected {
-                            theme.selected_style()
-                        } else {
-                            Style::default().bg(theme.bg).fg(theme.text)
-                        };
+                        let selected = resource_idx == self.selected_resource
+                            && operation_idx == self.selected_operation;
+                        if selected { selected_row = Some(action_lines.len()); }
+                        let prefix     = if selected { "›" } else { " " };
+                        let pill_style = if actions_dimmed { theme.dim_style() }
+                            else if selected { theme.selected_style() }
+                            else { Style::default().bg(theme.bg).fg(theme.text) };
                         action_lines.push(Line::from(vec![
-                            Span::styled(
-                                format!("{prefix} "),
-                                if actions_dimmed {
-                                    theme.dim_style()
-                                } else {
-                                    Style::default().fg(theme.accent)
-                                },
-                            ),
+                            Span::styled(format!("{prefix} "),
+                                if actions_dimmed { theme.dim_style() } else { Style::default().fg(theme.accent) }),
                             Span::styled(format!(" {} ", op.verb), pill_style),
-                            Span::styled(
-                                format!("  {}", op.description),
-                                theme.dim_style(),
-                            ),
+                            Span::styled(format!("  {}", op.description), theme.dim_style()),
                         ]));
                     }
                 }
@@ -5463,31 +5624,23 @@ impl Screen for ResourceScreen {
             )));
         }
 
-        let actions_area = actions_inner.inner(Margin { horizontal: 1, vertical: 1 });
+        let actions_area    = actions_inner.inner(Margin { horizontal: 1, vertical: 1 });
         let viewport_height = actions_area.height as usize;
-        let mut scroll_offset = 0;
-        if let Some(row) = selected_row {
-            // Keep the selected row roughly centered if it's past the first page.
-            if row >= viewport_height {
-                scroll_offset = (row - viewport_height / 2) as u16;
-            }
-        }
+        let scroll_offset   = selected_row
+            .filter(|&row| row >= viewport_height)
+            .map(|row| (row - viewport_height / 2) as u16)
+            .unwrap_or(0);
 
-        let actions = Paragraph::new(Text::from(action_lines))
-            .wrap(Wrap { trim: true })
-            .scroll((scroll_offset, 0))
-            .style(Style::default().fg(theme.text));
-        frame.render_widget(actions, actions_area);
+        frame.render_widget(
+            Paragraph::new(Text::from(action_lines)).wrap(Wrap { trim: true })
+                .scroll((scroll_offset, 0)).style(Style::default().fg(theme.text)),
+            actions_area,
+        );
 
         let footer = match self.current_operation() {
-            Some(_op) => {
-                let prompt = self.prompt_label();
-                let hint = if self.operation_needs_input() {
-                    "input"
-                } else {
-                    "ready"
-                };
-                format!("{prompt}  [{hint}]")
+            Some(_) => {
+                let hint = if self.operation_needs_input() { "input" } else { "ready" };
+                format!("{}  [{hint}]", self.prompt_label())
             }
             None => "> no actions available".to_string(),
         };
@@ -5506,24 +5659,17 @@ impl Screen for ResourceScreen {
             "j/k move  Enter run/open  Ctrl-U/D scroll  PgUp/PgDn scroll  Ctrl-P palette  q quit".to_string()
         };
 
-        let info = Paragraph::new(Text::from(vec![
-            Line::from(prompt_line),
-            Line::from(Span::styled(
-                helper_line,
-                theme.dim_style(),
-            )),
-        ]))
-            .wrap(Wrap { trim: true })
-            .style(Style::default().fg(theme.text))
-            .block(
-                Block::default()
-                    .title(" Prompt ")
-                    .borders(Borders::ALL)
-                    .border_style(theme.border_focus_style())
-                    .title_style(theme.title_style())
-                    .style(Style::default().bg(theme.bg_secondary)),
-            );
-        frame.render_widget(info, chunks[3]);
+        frame.render_widget(
+            Paragraph::new(Text::from(vec![
+                Line::from(prompt_line),
+                Line::from(Span::styled(helper_line, theme.dim_style())),
+            ]))
+            .wrap(Wrap { trim: true }).style(Style::default().fg(theme.text))
+            .block(Block::default().title(" Prompt ").borders(Borders::ALL)
+                .border_style(theme.border_focus_style()).title_style(theme.title_style())
+                .style(Style::default().bg(theme.bg_secondary))),
+            chunks[3],
+        );
     }
 
     fn handle_event(&mut self, event: &AppEvent) -> ScreenAction {
@@ -5536,18 +5682,13 @@ impl Screen for ResourceScreen {
             }
             if let Some(index) = self.pending_entry {
                 if let Some(entry) = self.transcript.get_mut(index) {
-                    entry.pending_frame = (entry.pending_frame + 1) % 4;
-                    entry.body = format!("Running command{}", ".".repeat(entry.pending_frame + 1));
+                    entry.pending_frame = entry.pending_frame.wrapping_add(1);
                 }
             }
             return ScreenAction::None;
         }
 
-        let has_operations = self
-            .resources
-            .iter()
-            .any(|resource| !resource.operations.is_empty());
-
+        let has_operations = self.resources.iter().any(|r| !r.operations.is_empty());
         if !has_operations {
             return if is_key(event, KeyCode::Char('q')) || is_key(event, KeyCode::Esc) {
                 ScreenAction::Quit
@@ -5560,85 +5701,59 @@ impl Screen for ResourceScreen {
             if let AppEvent::Key(key) = event {
                 match key.code {
                     KeyCode::Esc => {
-                        self.composer = None;
-                        self.prompt_message = None;
+                        self.composer = None; self.prompt_message = None;
                         return ScreenAction::None;
                     }
                     KeyCode::Backspace => {
                         composer.buffer.pop();
-                        composer.cursor_visible = true;
-                        self.prompt_message = None;
+                        composer.cursor_visible = true; self.prompt_message = None;
                         return ScreenAction::None;
                     }
                     KeyCode::Enter => {}
                     KeyCode::Char(ch) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
                         composer.buffer.push(ch);
-                        composer.cursor_visible = true;
-                        self.prompt_message = None;
+                        composer.cursor_visible = true; self.prompt_message = None;
                         return ScreenAction::None;
                     }
                     _ => return ScreenAction::None,
                 }
                 if matches!(key.code, KeyCode::Enter) {
                     let submitted = composer.buffer.trim().to_string();
-                    let result = self.build_dispatch(&submitted);
-                    match result {
-                        Ok(action) => {
-                            self.composer = None;
-                            self.prompt_message = None;
-                            return action;
-                        }
-                        Err(error) => {
-                            self.prompt_message = Some(error);
-                            return ScreenAction::None;
-                        }
+                    match self.build_dispatch(&submitted) {
+                        Ok(action) => { self.composer = None; self.prompt_message = None; return action; }
+                        Err(error) => { self.prompt_message = Some(error); return ScreenAction::None; }
                     }
                 }
             }
         }
 
         if is_key(event, KeyCode::Down) || is_char(event, 'j') {
-            self.advance_operation(1);
-            ScreenAction::None
+            self.advance_operation(1); ScreenAction::None
         } else if is_key(event, KeyCode::Up) || is_char(event, 'k') {
-            self.advance_operation(-1);
-            ScreenAction::None
+            self.advance_operation(-1); ScreenAction::None
         } else if is_key(event, KeyCode::PageDown)
-            || (is_char(event, 'd')
-                && matches!(event, AppEvent::Key(key) if key.modifiers.contains(KeyModifiers::CONTROL)))
+            || (is_char(event, 'd') && matches!(event, AppEvent::Key(k) if k.modifiers.contains(KeyModifiers::CONTROL)))
         {
-            self.scroll_by((self.viewport_lines.max(1) / 2) as i16);
-            ScreenAction::None
+            self.scroll_by((self.viewport_lines.max(1) / 2) as i16); ScreenAction::None
         } else if is_key(event, KeyCode::PageUp)
-            || (is_char(event, 'u')
-                && matches!(event, AppEvent::Key(key) if key.modifiers.contains(KeyModifiers::CONTROL)))
+            || (is_char(event, 'u') && matches!(event, AppEvent::Key(k) if k.modifiers.contains(KeyModifiers::CONTROL)))
         {
-            self.scroll_by(-((self.viewport_lines.max(1) / 2) as i16));
-            ScreenAction::None
+            self.scroll_by(-((self.viewport_lines.max(1) / 2) as i16)); ScreenAction::None
         } else if is_key(event, KeyCode::End) {
-            self.scroll_to_bottom();
-            ScreenAction::None
+            self.scroll_to_bottom(); ScreenAction::None
         } else if is_key(event, KeyCode::Home) {
-            self.scroll = 0;
-            self.auto_follow = false;
-            ScreenAction::None
+            self.scroll = 0; self.auto_follow = false; ScreenAction::None
         } else if is_key(event, KeyCode::Esc) || is_key(event, KeyCode::Char('q')) {
             ScreenAction::Quit
         } else if is_key(event, KeyCode::Enter) {
             if self.operation_needs_input() {
-                self.composer = Some(ComposerState {
-                    buffer: String::new(),
-                    cursor_visible: true,
-                });
+                self.composer = Some(ComposerState { buffer: String::new(), cursor_visible: true });
                 self.prompt_message = Some(format!("expected: {}", self.prompt_placeholder()));
                 ScreenAction::None
             } else {
                 match self.build_dispatch("") {
                     Ok(action) => action,
-                    Err(error) => {
-                        self.prompt_message = Some(error);
-                        ScreenAction::None
-                    }
+                    Err(error) => { self.prompt_message = Some(error); ScreenAction::None }
                 }
             }
         } else {
@@ -5649,11 +5764,7 @@ impl Screen for ResourceScreen {
 
 // ── Built-in screens ──────────────────────────────────────────────────────────
 
-/// Simple message/result screen. Shows a title + body text.
-pub struct MessageScreen {
-    title: String,
-    body:  String,
-}
+pub struct MessageScreen { title: String, body: String }
 
 impl MessageScreen {
     pub fn new(title: impl Into<String>, body: impl Into<String>) -> Box<Self> {
@@ -5661,10 +5772,7 @@ impl MessageScreen {
     }
 }
 
-pub struct PaletteScreen {
-    items:    Vec<PaletteItem>,
-    selected: usize,
-}
+pub struct PaletteScreen { items: Vec<PaletteItem>, selected: usize }
 
 impl PaletteScreen {
     pub fn new(items: Vec<PaletteItem>) -> Box<Self> {
@@ -5676,39 +5784,25 @@ impl Screen for MessageScreen {
     fn title(&self) -> &str { &self.title }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
-        use ratatui::{
-            layout::{Alignment, Margin},
-            text::Text,
-            widgets::{Block, Borders, Paragraph, Wrap},
-        };
-
-        let block = Block::default()
-            .title(self.title.as_str())
-            .borders(Borders::ALL)
-            .border_style(theme.border_style())
-            .title_style(theme.title_style())
+        use ratatui::{layout::{Alignment, Margin}, text::Text, widgets::{Block, Borders, Paragraph, Wrap}};
+        let block = Block::default().title(self.title.as_str()).borders(Borders::ALL)
+            .border_style(theme.border_style()).title_style(theme.title_style())
             .style(ratatui::style::Style::default().bg(theme.bg));
-
         let inner = block.inner(area);
         frame.render_widget(block, area);
-
-        let para = Paragraph::new(Text::raw(&self.body))
-            .wrap(Wrap { trim: true })
-            .alignment(Alignment::Left)
-            .style(ratatui::style::Style::default().fg(theme.text));
-
-        frame.render_widget(para, inner.inner(Margin { horizontal: 1, vertical: 1 }));
+        frame.render_widget(
+            Paragraph::new(Text::raw(&self.body)).wrap(Wrap { trim: true })
+                .alignment(Alignment::Left)
+                .style(ratatui::style::Style::default().fg(theme.text)),
+            inner.inner(Margin { horizontal: 1, vertical: 1 }),
+        );
     }
 
     fn handle_event(&mut self, event: &AppEvent) -> ScreenAction {
         use crate::events::is_key;
         use crossterm::event::KeyCode;
-
-        if is_key(event, KeyCode::Esc) || is_key(event, KeyCode::Enter) {
-            ScreenAction::Pop
-        } else {
-            ScreenAction::None
-        }
+        if is_key(event, KeyCode::Esc) || is_key(event, KeyCode::Enter) { ScreenAction::Pop }
+        else { ScreenAction::None }
     }
 }
 
@@ -5716,58 +5810,31 @@ impl Screen for PaletteScreen {
     fn title(&self) -> &str { "Palette" }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, theme: &Theme) {
-        use ratatui::{
-            layout::Margin,
-            style::Style,
-            text::{Line, Span, Text},
-            widgets::{Block, Borders, Paragraph, Wrap},
-        };
-
-        let block = Block::default()
-            .title(" Palette ")
-            .borders(Borders::ALL)
-            .border_style(theme.border_focus_style())
-            .title_style(theme.title_style())
+        use ratatui::{layout::Margin, style::Style, text::{Line, Span, Text}, widgets::{Block, Borders, Paragraph, Wrap}};
+        let block = Block::default().title(" Palette ").borders(Borders::ALL)
+            .border_style(theme.border_focus_style()).title_style(theme.title_style())
             .style(Style::default().bg(theme.bg_secondary));
         let inner = block.inner(area);
         frame.render_widget(block, area);
 
         let lines: Vec<Line> = if self.items.is_empty() {
-            vec![Line::from(Span::styled(
-                "No palette items registered",
-                theme.dim_style(),
-            ))]
+            vec![Line::from(Span::styled("No palette items registered", theme.dim_style()))]
         } else {
-            self.items
-                .iter()
-                .enumerate()
-                .map(|(idx, item)| {
-                    let prefix = if idx == self.selected { "▶ " } else { "  " };
-                    let style = if idx == self.selected {
-                        theme.selected_style()
-                    } else {
-                        Style::default().fg(theme.text)
-                    };
-
-                    let mut spans = vec![
-                        Span::styled(prefix, style),
-                        Span::styled(item.title.as_str(), style),
-                    ];
-                    if let Some(description) = &item.description {
-                        spans.push(Span::styled(
-                            format!("  {}", description),
-                            theme.dim_style(),
-                        ));
-                    }
-                    Line::from(spans)
-                })
-                .collect()
+            self.items.iter().enumerate().map(|(idx, item)| {
+                let prefix = if idx == self.selected { "▶ " } else { "  " };
+                let style  = if idx == self.selected { theme.selected_style() } else { Style::default().fg(theme.text) };
+                let mut spans = vec![Span::styled(prefix, style), Span::styled(item.title.as_str(), style)];
+                if let Some(desc) = &item.description {
+                    spans.push(Span::styled(format!("  {}", desc), theme.dim_style()));
+                }
+                Line::from(spans)
+            }).collect()
         };
 
-        let para = Paragraph::new(Text::from(lines))
-            .wrap(Wrap { trim: true })
-            .style(Style::default().fg(theme.text));
-        frame.render_widget(para, inner.inner(Margin { horizontal: 1, vertical: 1 }));
+        frame.render_widget(
+            Paragraph::new(Text::from(lines)).wrap(Wrap { trim: true }).style(Style::default().fg(theme.text)),
+            inner.inner(Margin { horizontal: 1, vertical: 1 }),
+        );
     }
 
     fn handle_event(&mut self, event: &AppEvent) -> ScreenAction {
@@ -5777,34 +5844,23 @@ impl Screen for PaletteScreen {
         if self.items.is_empty() {
             return if is_key(event, KeyCode::Esc) || is_key(event, KeyCode::Enter) {
                 ScreenAction::Pop
-            } else {
-                ScreenAction::None
-            };
+            } else { ScreenAction::None };
         }
 
         if is_key(event, KeyCode::Down) || is_char(event, 'j') {
-            self.selected = (self.selected + 1) % self.items.len();
-            ScreenAction::None
+            self.selected = (self.selected + 1) % self.items.len(); ScreenAction::None
         } else if is_key(event, KeyCode::Up) || is_char(event, 'k') {
-            self.selected = if self.selected == 0 {
-                self.items.len() - 1
-            } else {
-                self.selected - 1
-            };
+            self.selected = if self.selected == 0 { self.items.len() - 1 } else { self.selected - 1 };
             ScreenAction::None
         } else if is_key(event, KeyCode::Esc) {
             ScreenAction::Pop
         } else if is_key(event, KeyCode::Enter) {
             let item = &self.items[self.selected];
             ScreenAction::Dispatch {
-                resource: item.resource.clone(),
-                verb: item.verb.clone(),
-                positional: item.positional.clone(),
-                flags: item.flags.clone(),
+                resource: item.resource.clone(), verb: item.verb.clone(),
+                positional: item.positional.clone(), flags: item.flags.clone(),
             }
-        } else {
-            ScreenAction::None
-        }
+        } else { ScreenAction::None }
     }
 }
 

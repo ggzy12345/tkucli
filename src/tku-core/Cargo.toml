@@ -19,3 +19,4 @@ tracing.workspace     = true
 async-trait.workspace = true
 toml.workspace        = true
 serde_yaml.workspace  = true
+cliclack.workspace    = true

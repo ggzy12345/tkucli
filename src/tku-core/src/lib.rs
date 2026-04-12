@@ -4,12 +4,13 @@ pub mod extract;
 pub mod handler;
 pub mod middleware;
 pub mod output;
+pub mod progress;
 pub mod router;
 pub mod schema;
 
 /// Convenient re-exports for handler implementors.
 pub mod prelude {
-    pub use crate::context::Ctx;
+    pub use crate::context::{Ctx, ProgressSender};
     pub use crate::error::{TkucliError, TkucliResult};
     pub use crate::extract::{ArgValue, FromArgs, Optional, ParsedArgs};
     pub use crate::handler::{
@@ -18,6 +19,7 @@ pub mod prelude {
     };
     pub use crate::middleware::{AuthLayer, ConfirmLayer, Layer, LoggingLayer, ServiceBuilder};
     pub use crate::output::{IntoOutput, Record, Render, RenderFormat, Success, Table};
+    pub use crate::progress::TaskSpinner;
     pub use crate::router::Router;
     pub use async_trait::async_trait;
 }
