@@ -762,19 +762,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_yaml"
-version = "0.9.34+deprecated"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
-dependencies = [
- "indexmap",
- "itoa",
- "ryu",
- "serde",
- "unsafe-libyaml",
-]
-
-[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -975,7 +962,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde",
- "serde_yaml",
  "syn 2.0.117",
  "thiserror",
  "tku-core",
@@ -993,7 +979,6 @@ dependencies = [
  "indicatif 0.17.11",
  "serde",
  "serde_json",
- "serde_yaml",
  "tabled",
  "thiserror",
  "tokio",
@@ -1216,12 +1201,6 @@ name = "unit-prefix"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81e544489bf3d8ef66c953931f56617f423cd4b5494be343d9b9d3dda037b9a3"
-
-[[package]]
-name = "unsafe-libyaml"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
 name = "utf8parse"
@@ -1540,7 +1519,6 @@ tokio       = { version = "1",      features = ["full"] }
 serde       = { version = "1",      features = ["derive"] }
 serde_json  = "1"
 toml        = "0.8"
-serde_yaml  = "0.9"
 thiserror   = "1"
 anyhow      = "1"
 clap        = { version = "4",      features = ["derive", "env"] }
@@ -1801,7 +1779,6 @@ syn.workspace         = true
 prettyplease.workspace = true
 serde.workspace       = true
 toml.workspace        = true
-serde_yaml.workspace  = true
 thiserror.workspace   = true
 anyhow.workspace      = true
 
@@ -2941,7 +2918,6 @@ indicatif.workspace   = true
 tracing.workspace     = true
 async-trait.workspace = true
 toml.workspace        = true
-serde_yaml.workspace  = true
 cliclack.workspace    = true
 
 ```
@@ -4094,15 +4070,15 @@ use serde::{Deserialize, Serialize};
 /// Top-level deserialized config (`cli.toml` / `cli.yaml`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppSchema {
-    pub app:        AppMeta,
+    pub app: AppMeta,
     #[serde(default)]
-    pub root:       RootConfig,
+    pub root: RootConfig,
     #[serde(default)]
-    pub tui:        TuiConfig,
+    pub tui: TuiConfig,
     #[serde(default)]
     pub middleware: MiddlewareConfig,
     #[serde(rename = "resource", default)]
-    pub resources:  Vec<ResourceSchema>,
+    pub resources: Vec<ResourceSchema>,
 }
 
 /// Operations that belong directly to the root of the CLI
@@ -4115,14 +4091,16 @@ pub struct RootConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppMeta {
-    pub name:           String,
-    pub version:        String,
-    pub description:    String,
+    pub name: String,
+    pub version: String,
+    pub description: String,
     #[serde(default = "default_output")]
     pub default_output: OutputFormat,
 }
 
-fn default_output() -> OutputFormat { OutputFormat::Table }
+fn default_output() -> OutputFormat {
+    OutputFormat::Table
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
@@ -4136,17 +4114,19 @@ pub enum OutputFormat {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct TuiConfig {
     #[serde(default)]
-    pub enabled:        bool,
+    pub enabled: bool,
     #[serde(default = "default_theme")]
-    pub theme:          String,
+    pub theme: String,
     pub default_screen: Option<String>,
 }
 
-fn default_theme() -> String { "dark".into() }
+fn default_theme() -> String {
+    "dark".into()
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct MiddlewareConfig {
-    pub auth:    Option<AuthConfig>,
+    pub auth: Option<AuthConfig>,
     pub logging: Option<LoggingConfig>,
 }
 
@@ -4154,57 +4134,57 @@ pub struct MiddlewareConfig {
 pub struct AuthConfig {
     #[serde(rename = "type")]
     pub auth_type: String,
-    pub env:       String,
+    pub env: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoggingConfig {
     pub level: String,
-    pub file:  Option<String>,
+    pub file: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResourceSchema {
-    pub name:        String,
+    pub name: String,
     pub description: String,
     #[serde(rename = "operation", default)]
-    pub operations:  Vec<OperationSchema>,
+    pub operations: Vec<OperationSchema>,
     #[serde(rename = "subresource", default)]
     pub subresources: Vec<ResourceSchema>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OperationSchema {
-    pub verb:        String,
+    pub verb: String,
     pub description: String,
     #[serde(default)]
-    pub args:        Vec<ArgSchema>,
+    pub args: Vec<ArgSchema>,
     #[serde(default)]
-    pub flags:       Vec<FlagSchema>,
+    pub flags: Vec<FlagSchema>,
     /// If true, the framework prompts for confirmation before invoking.
     #[serde(default)]
-    pub confirm:     bool,
+    pub confirm: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ArgSchema {
-    pub name:     String,
+    pub name: String,
     #[serde(rename = "type")]
     pub arg_type: ArgType,
     #[serde(default)]
     pub required: bool,
-    pub help:     Option<String>,
+    pub help: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FlagSchema {
-    pub name:     String,
-    pub short:    Option<String>,
+    pub name: String,
+    pub short: Option<String>,
     #[serde(rename = "type")]
     pub arg_type: ArgType,
-    pub default:  Option<String>,
-    pub help:     Option<String>,
-    pub values:   Option<Vec<String>>, // for enum types
+    pub default: Option<String>,
+    pub help: Option<String>,
+    pub values: Option<Vec<String>>, // for enum types
     #[serde(default)]
     pub required: bool,
 }
@@ -4224,23 +4204,31 @@ pub enum ArgType {
 impl AppSchema {
     pub fn total_resources(&self) -> usize {
         // root counts as 1 implicit resource when it has operations
-        let root_count = if self.root.operations.is_empty() { 0 } else { 1 };
-        root_count + self.resources.iter().map(ResourceSchema::total_resources).sum::<usize>()
+        let root_count = if self.root.operations.is_empty() {
+            0
+        } else {
+            1
+        };
+        root_count
+            + self
+                .resources
+                .iter()
+                .map(ResourceSchema::total_resources)
+                .sum::<usize>()
     }
 
     pub fn total_operations(&self) -> usize {
         self.root.operations.len()
-            + self.resources.iter().map(ResourceSchema::total_operations).sum::<usize>()
+            + self
+                .resources
+                .iter()
+                .map(ResourceSchema::total_operations)
+                .sum::<usize>()
     }
 
     /// Load from a TOML string.
     pub fn from_toml(src: &str) -> Result<Self, String> {
         toml::from_str(src).map_err(|e| e.to_string())
-    }
-
-    /// Load from a YAML string.
-    pub fn from_yaml(src: &str) -> Result<Self, String> {
-        serde_yaml::from_str(src).map_err(|e| e.to_string())
     }
 
     /// Auto-detect format from file extension and parse.
@@ -4249,7 +4237,6 @@ impl AppSchema {
             .map_err(|e| format!("could not read {}: {e}", path.display()))?;
         match path.extension().and_then(|e| e.to_str()) {
             Some("toml") => Self::from_toml(&src),
-            Some("yaml") | Some("yml") => Self::from_yaml(&src),
             other => Err(format!("unsupported config format: {other:?}")),
         }
     }
@@ -6213,18 +6200,10 @@ pub async fn run(args: CheckArgs) -> anyhow::Result<()> {
 use clap::Args;
 
 #[derive(Args)]
-pub struct InitArgs {
-    /// Emit YAML instead of TOML
-    #[arg(long)]
-    pub yaml: bool,
-}
+pub struct InitArgs {}
 
-pub async fn run(args: InitArgs) -> anyhow::Result<()> {
-    if args.yaml {
-        print!("{}", YAML_TEMPLATE);
-    } else {
-        print!("{}", TOML_TEMPLATE);
-    }
+pub async fn run(_args: InitArgs) -> anyhow::Result<()> {
+    print!("{}", TOML_TEMPLATE);
     Ok(())
 }
 
@@ -6272,31 +6251,6 @@ description = "Manage users"
   ]
 "#;
 
-const YAML_TEMPLATE: &str = r#"app:
-  name: my-app
-  version: 0.1.0
-  description: My Tkucli CLI
-  default_output: table
-
-tui:
-  enabled: true
-  theme: dark
-
-resource:
-  - name: users
-    description: Manage users
-    operation:
-      - verb: list
-        description: List all users
-        flags:
-          - { name: filter, short: f, type: string }
-          - { name: limit,  short: "n", type: u32, default: "20" }
-      - verb: get
-        description: Get a user by ID
-        args:
-          - { name: id, type: u64, required: true }
-"#;
-
 ```
 
 ## File: src/tkucli/src/commands/mod.rs
@@ -6320,9 +6274,6 @@ pub struct NewArgs {
     /// Directory to create (defaults to `./<name>`)
     #[arg(long)]
     pub path: Option<PathBuf>,
-    /// Config format: toml (default) or yaml
-    #[arg(long, default_value = "toml")]
-    pub format: String,
     /// Scaffold a starter that includes a sub-resource example (`vm disk ...`)
     #[arg(long)]
     pub subresource_example: bool,
@@ -6345,7 +6296,10 @@ pub async fn run(args: NewArgs) -> anyhow::Result<()> {
     let tku_macros_path = workspace_root.join("tku-macros");
     let tku_codegen_path = workspace_root.join("tku-codegen");
 
-    println!("🔨 Creating new Tkucli project `{name}` at {}", root.display());
+    println!(
+        "🔨 Creating new Tkucli project `{name}` at {}",
+        root.display()
+    );
 
     std::fs::create_dir_all(root.join("src/handlers"))?;
 
@@ -6353,7 +6307,7 @@ pub async fn run(args: NewArgs) -> anyhow::Result<()> {
     std::fs::write(
         root.join("Cargo.toml"),
         format!(
-r#"[package]
+            r#"[package]
 name    = "{name}"
 version = "0.1.0"
 edition = "2021"
@@ -6371,8 +6325,7 @@ anyhow        = "1"
 
 [build-dependencies]
 tku-codegen = {{ path = "{}" }}
-"#
-        ,
+"#,
             tku_core_path.display(),
             tku_tui_path.display(),
             tku_macros_path.display(),
@@ -6390,12 +6343,11 @@ tku-codegen = {{ path = "{}" }}
     )?;
 
     // ── cli.toml ──────────────────────────────────────────────────────────────
-    let config_name = if args.format == "yaml" { "cli.yaml" } else { "cli.toml" };
     std::fs::write(
-        root.join(config_name),
+        root.join("cli.toml"),
         if use_root_example {
             format!(
-r#"[app]
+                r#"[app]
 name           = "{name}"
 version        = "0.1.0"
 description    = "A Tkucli-powered CLI"
@@ -6422,7 +6374,7 @@ theme          = "dark"
             )
         } else if use_subresource_example {
             format!(
-r#"[app]
+                r#"[app]
 name           = "{name}"
 version        = "0.1.0"
 description    = "A Tkucli-powered CLI"
@@ -6468,7 +6420,7 @@ description = "Virtual machines"
             )
         } else {
             format!(
-r#"[app]
+                r#"[app]
 name           = "{name}"
 version        = "0.1.0"
 description    = "A Tkucli-powered CLI"
@@ -6503,7 +6455,7 @@ description = "Example resource — replace with your own"
         root.join("src/main.rs"),
         if use_root_example {
             format!(
-r#"mod handlers;
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -6580,7 +6532,7 @@ async fn main() -> anyhow::Result<()> {{
             )
         } else if use_subresource_example {
             format!(
-r#"mod handlers;
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -6663,7 +6615,7 @@ async fn main() -> anyhow::Result<()> {{
             )
         } else {
             format!(
-r#"mod handlers;
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
