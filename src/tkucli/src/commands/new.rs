@@ -8,9 +8,6 @@ pub struct NewArgs {
     /// Directory to create (defaults to `./<name>`)
     #[arg(long)]
     pub path: Option<PathBuf>,
-    /// Config format: toml (default) or yaml
-    #[arg(long, default_value = "toml")]
-    pub format: String,
     /// Scaffold a starter that includes a sub-resource example (`vm disk ...`)
     #[arg(long)]
     pub subresource_example: bool,
@@ -33,7 +30,10 @@ pub async fn run(args: NewArgs) -> anyhow::Result<()> {
     let tku_macros_path = workspace_root.join("tku-macros");
     let tku_codegen_path = workspace_root.join("tku-codegen");
 
-    println!("🔨 Creating new Tkucli project `{name}` at {}", root.display());
+    println!(
+        "🔨 Creating new Tkucli project `{name}` at {}",
+        root.display()
+    );
 
     std::fs::create_dir_all(root.join("src/handlers"))?;
 
@@ -41,7 +41,7 @@ pub async fn run(args: NewArgs) -> anyhow::Result<()> {
     std::fs::write(
         root.join("Cargo.toml"),
         format!(
-r#"[package]
+            r#"[package]
 name    = "{name}"
 version = "0.1.0"
 edition = "2021"
@@ -59,8 +59,7 @@ anyhow        = "1"
 
 [build-dependencies]
 tku-codegen = {{ path = "{}" }}
-"#
-        ,
+"#,
             tku_core_path.display(),
             tku_tui_path.display(),
             tku_macros_path.display(),
@@ -78,12 +77,11 @@ tku-codegen = {{ path = "{}" }}
     )?;
 
     // ── cli.toml ──────────────────────────────────────────────────────────────
-    let config_name = if args.format == "yaml" { "cli.yaml" } else { "cli.toml" };
     std::fs::write(
-        root.join(config_name),
+        root.join("cli.toml"),
         if use_root_example {
             format!(
-r#"[app]
+                r#"[app]
 name           = "{name}"
 version        = "0.1.0"
 description    = "A Tkucli-powered CLI"
@@ -110,7 +108,7 @@ theme          = "dark"
             )
         } else if use_subresource_example {
             format!(
-r#"[app]
+                r#"[app]
 name           = "{name}"
 version        = "0.1.0"
 description    = "A Tkucli-powered CLI"
@@ -156,7 +154,7 @@ description = "Virtual machines"
             )
         } else {
             format!(
-r#"[app]
+                r#"[app]
 name           = "{name}"
 version        = "0.1.0"
 description    = "A Tkucli-powered CLI"
@@ -191,7 +189,7 @@ description = "Example resource — replace with your own"
         root.join("src/main.rs"),
         if use_root_example {
             format!(
-r#"mod handlers;
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -268,7 +266,7 @@ async fn main() -> anyhow::Result<()> {{
             )
         } else if use_subresource_example {
             format!(
-r#"mod handlers;
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -351,7 +349,7 @@ async fn main() -> anyhow::Result<()> {{
             )
         } else {
             format!(
-r#"mod handlers;
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{

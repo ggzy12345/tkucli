@@ -1,18 +1,10 @@
 use clap::Args;
 
 #[derive(Args)]
-pub struct InitArgs {
-    /// Emit YAML instead of TOML
-    #[arg(long)]
-    pub yaml: bool,
-}
+pub struct InitArgs {}
 
-pub async fn run(args: InitArgs) -> anyhow::Result<()> {
-    if args.yaml {
-        print!("{}", YAML_TEMPLATE);
-    } else {
-        print!("{}", TOML_TEMPLATE);
-    }
+pub async fn run(_args: InitArgs) -> anyhow::Result<()> {
+    print!("{}", TOML_TEMPLATE);
     Ok(())
 }
 
@@ -58,29 +50,4 @@ description = "Manage users"
     { name = "email", type = "string", required = true },
     { name = "role",  type = "enum", values = ["admin","user","viewer"], default = "user" },
   ]
-"#;
-
-const YAML_TEMPLATE: &str = r#"app:
-  name: my-app
-  version: 0.1.0
-  description: My Tkucli CLI
-  default_output: table
-
-tui:
-  enabled: true
-  theme: dark
-
-resource:
-  - name: users
-    description: Manage users
-    operation:
-      - verb: list
-        description: List all users
-        flags:
-          - { name: filter, short: f, type: string }
-          - { name: limit,  short: "n", type: u32, default: "20" }
-      - verb: get
-        description: Get a user by ID
-        args:
-          - { name: id, type: u64, required: true }
 "#;
