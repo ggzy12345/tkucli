@@ -11,8 +11,8 @@ pub struct CheckArgs {
 pub async fn run(args: CheckArgs) -> anyhow::Result<()> {
     println!("🔍 Checking {}", args.config.display());
 
-    let schema = tku_core::schema::AppSchema::from_file(&args.config)
-        .map_err(|e| anyhow::anyhow!(e))?;
+    let schema =
+        tku_core::schema::AppSchema::from_file(&args.config).map_err(|e| anyhow::anyhow!(e))?;
 
     tku_codegen::SchemaValidator::new(&schema).validate()?;
 

@@ -1,6 +1,6 @@
 use crate::{
-    extension::{PaletteItem, ScreenFactory, TuiBuildCtx, TuiExtension, TuiRegistry},
     events::{spawn_event_loop, AppEvent},
+    extension::{PaletteItem, ScreenFactory, TuiBuildCtx, TuiExtension, TuiRegistry},
     screen::{PaletteScreen, ResourceScreen, Screen, ScreenAction, ScreenLabels},
     theme::Theme,
     widgets::StatusBar,
@@ -15,47 +15,47 @@ use ratatui::{
     layout::{Constraint, Direction, Layout},
     Terminal,
 };
+use std::{collections::HashMap, io, sync::Arc};
 use tku_core::{
     context::Ctx,
     extract::{ArgValue, ParsedArgs},
     handler::{CliRequest, CliService},
     schema::AppSchema,
 };
-use std::{collections::HashMap, io, sync::Arc};
 use tokio::sync::mpsc;
 
 pub struct TuiApp {
-    theme:           Theme,
-    status_bar:      StatusBar,
+    theme: Theme,
+    status_bar: StatusBar,
     _custom_screens: HashMap<String, Arc<dyn ScreenFactory>>,
-    palette_items:   Vec<PaletteItem>,
-    service:         Arc<dyn CliService>,
-    ctx:             Ctx,
-    screen_stack:    Vec<Box<dyn Screen>>,
+    palette_items: Vec<PaletteItem>,
+    service: Arc<dyn CliService>,
+    ctx: Ctx,
+    screen_stack: Vec<Box<dyn Screen>>,
 }
 
 pub struct TuiAppBuilder {
-    theme:      Option<Theme>,
-    schema:     Option<AppSchema>,
-    service:    Option<Arc<dyn CliService>>,
-    ctx:        Option<Ctx>,
+    theme: Option<Theme>,
+    schema: Option<AppSchema>,
+    service: Option<Arc<dyn CliService>>,
+    ctx: Option<Ctx>,
     extensions: Vec<Box<dyn TuiExtension>>,
     /// Optional label overrides. Falls back to `ScreenLabels::default()`.
-    labels:     Option<ScreenLabels>,
+    labels: Option<ScreenLabels>,
 }
 
 impl TuiApp {
     pub fn new(
-        theme:          Theme,
+        theme: Theme,
         initial_screen: Box<dyn Screen>,
         custom_screens: HashMap<String, Arc<dyn ScreenFactory>>,
-        palette_items:  Vec<PaletteItem>,
-        service:        Arc<dyn CliService>,
-        ctx:            Ctx,
+        palette_items: Vec<PaletteItem>,
+        service: Arc<dyn CliService>,
+        ctx: Ctx,
     ) -> Self {
         Self {
             theme,
-            status_bar:      StatusBar::new(),
+            status_bar: StatusBar::new(),
             _custom_screens: custom_screens,
             palette_items,
             service,
@@ -66,20 +66,20 @@ impl TuiApp {
 
     pub fn builder() -> TuiAppBuilder {
         TuiAppBuilder {
-            theme:      None,
-            schema:     None,
-            service:    None,
-            ctx:        None,
+            theme: None,
+            schema: None,
+            service: None,
+            ctx: None,
             extensions: Vec::new(),
-            labels:     None,
+            labels: None,
         }
     }
 
     pub fn from_schema(
-        theme:   Theme,
-        schema:  &AppSchema,
+        theme: Theme,
+        schema: &AppSchema,
         service: Arc<dyn CliService>,
-        ctx:     Ctx,
+        ctx: Ctx,
     ) -> Self {
         Self::builder()
             .theme(theme)
@@ -94,15 +94,22 @@ impl TuiApp {
         enable_raw_mode()?;
         let mut stdout = io::stdout();
         execute!(stdout, EnterAlternateScreen)?;
-        let backend  = CrosstermBackend::new(stdout);
+        let backend = CrosstermBackend::new(stdout);
         let mut term = Terminal::new(backend)?;
 
         let mut events = spawn_event_loop(400);
 
         loop {
-            Self::draw_frame(&mut term, &mut self.screen_stack, &self.theme, &mut self.status_bar)?;
+            Self::draw_frame(
+                &mut term,
+                &mut self.screen_stack,
+                &self.theme,
+                &mut self.status_bar,
+            )?;
 
-            let Some(event) = events.recv().await else { break };
+            let Some(event) = events.recv().await else {
+                break;
+            };
 
             match &event {
                 AppEvent::Quit => break,
@@ -111,7 +118,8 @@ impl TuiApp {
                         && k.modifiers.contains(KeyModifiers::CONTROL) =>
                 {
                     if !self.palette_items.is_empty() {
-                        self.screen_stack.push(PaletteScreen::new(self.palette_items.clone()));
+                        self.screen_stack
+                            .push(PaletteScreen::new(self.palette_items.clone()));
                     } else {
                         self.status_bar.set("No palette items registered");
                     }
@@ -123,7 +131,9 @@ impl TuiApp {
             match self.screen_stack.last_mut() {
                 Some(screen) => {
                     let action = screen.handle_event(&event);
-                    if self.apply_action(action, &mut term, &mut events).await { break; }
+                    if self.apply_action(action, &mut term, &mut events).await {
+                        break;
+                    }
                 }
                 None => break,
             }
@@ -136,10 +146,10 @@ impl TuiApp {
     }
 
     fn draw_frame(
-        term:         &mut Terminal<CrosstermBackend<io::Stdout>>,
+        term: &mut Terminal<CrosstermBackend<io::Stdout>>,
         screen_stack: &mut Vec<Box<dyn Screen>>,
-        theme:        &Theme,
-        status_bar:   &mut StatusBar,
+        theme: &Theme,
+        status_bar: &mut StatusBar,
     ) -> anyhow::Result<()> {
         term.draw(|frame| {
             let chunks = Layout::default()
@@ -158,26 +168,36 @@ impl TuiApp {
     async fn apply_action(
         &mut self,
         action: ScreenAction,
-        term:   &mut Terminal<CrosstermBackend<io::Stdout>>,
+        term: &mut Terminal<CrosstermBackend<io::Stdout>>,
         events: &mut mpsc::UnboundedReceiver<AppEvent>,
     ) -> bool {
         match action {
-            ScreenAction::None    => false,
-            ScreenAction::Quit    => true,
-            ScreenAction::Pop     => {
-                if self.screen_stack.len() > 1 { self.screen_stack.pop(); }
+            ScreenAction::None => false,
+            ScreenAction::Quit => true,
+            ScreenAction::Pop => {
+                if self.screen_stack.len() > 1 {
+                    self.screen_stack.pop();
+                }
                 false
             }
             ScreenAction::Push(screen) => {
-                self.screen_stack.push(screen); false
+                self.screen_stack.push(screen);
+                false
             }
             ScreenAction::Replace(screen) => {
                 self.screen_stack.pop();
                 self.screen_stack.push(screen);
                 false
             }
-            ScreenAction::Dispatch { resource, verb, positional, flags } => {
-                if self.screen_stack.last()
+            ScreenAction::Dispatch {
+                resource,
+                verb,
+                positional,
+                flags,
+            } => {
+                if self
+                    .screen_stack
+                    .last()
                     .map(|s| !s.prefers_inline_results())
                     .unwrap_or(false)
                     && self.screen_stack.len() > 1
@@ -199,19 +219,26 @@ impl TuiApp {
                 self.status_bar.set(format!("Running {display_label}…"));
 
                 let mut args = ParsedArgs::new();
-                for value in positional          { args.push(value); }
-                for (key, value) in flags        { args.insert(key, ArgValue::String(value)); }
+                for value in positional {
+                    args.push(value);
+                }
+                for (key, value) in flags {
+                    args.insert(key, ArgValue::String(value));
+                }
 
                 let (progress_tx, mut progress_rx) = mpsc::unbounded_channel::<String>();
                 let req_ctx = self.ctx.clone().with_progress(progress_tx);
-                let req     = CliRequest::new(req_ctx, resource.clone(), verb.clone(), args);
+                let req = CliRequest::new(req_ctx, resource.clone(), verb.clone(), args);
 
-                let svc      = self.service.clone();
+                let svc = self.service.clone();
                 let mut task = tokio::spawn(async move { svc.call(req).await });
 
                 let result = loop {
                     let _ = Self::draw_frame(
-                        term, &mut self.screen_stack, &self.theme, &mut self.status_bar,
+                        term,
+                        &mut self.screen_stack,
+                        &self.theme,
+                        &mut self.status_bar,
                     );
 
                     tokio::select! {
@@ -273,10 +300,10 @@ impl TuiApp {
 }
 
 fn format_command(
-    resource:   &str,
-    verb:       &str,
+    resource: &str,
+    verb: &str,
     positional: &[String],
-    flags:      &HashMap<String, String>,
+    flags: &HashMap<String, String>,
 ) -> String {
     let mut parts = if resource == "$root" {
         vec![verb.to_string()]
@@ -284,8 +311,7 @@ fn format_command(
         vec![resource.to_string(), verb.to_string()]
     };
     parts.extend(positional.iter().cloned());
-    let mut flag_parts: Vec<String> =
-        flags.iter().map(|(k, v)| format!("--{k} {v}")).collect();
+    let mut flag_parts: Vec<String> = flags.iter().map(|(k, v)| format!("--{k} {v}")).collect();
     flag_parts.sort();
     parts.extend(flag_parts);
     parts.join(" ")
@@ -293,19 +319,24 @@ fn format_command(
 
 impl TuiAppBuilder {
     pub fn theme(mut self, theme: Theme) -> Self {
-        self.theme = Some(theme); self
+        self.theme = Some(theme);
+        self
     }
     pub fn schema(mut self, schema: AppSchema) -> Self {
-        self.schema = Some(schema); self
+        self.schema = Some(schema);
+        self
     }
     pub fn service(mut self, service: Arc<dyn CliService>) -> Self {
-        self.service = Some(service); self
+        self.service = Some(service);
+        self
     }
     pub fn ctx(mut self, ctx: Ctx) -> Self {
-        self.ctx = Some(ctx); self
+        self.ctx = Some(ctx);
+        self
     }
     pub fn extension<E: TuiExtension + 'static>(mut self, extension: E) -> Self {
-        self.extensions.push(Box::new(extension)); self
+        self.extensions.push(Box::new(extension));
+        self
     }
 
     /// Override the default `"running"` / `"latest"` header labels.
@@ -320,22 +351,30 @@ impl TuiAppBuilder {
     ///     })
     /// ```
     pub fn labels(mut self, labels: ScreenLabels) -> Self {
-        self.labels = Some(labels); self
+        self.labels = Some(labels);
+        self
     }
 
     pub fn build(self) -> anyhow::Result<TuiApp> {
-        let theme   = self.theme  .ok_or_else(|| anyhow::anyhow!("missing theme"))?;
-        let schema  = self.schema .ok_or_else(|| anyhow::anyhow!("missing schema"))?;
-        let service = self.service.ok_or_else(|| anyhow::anyhow!("missing service"))?;
-        let ctx     = self.ctx    .ok_or_else(|| anyhow::anyhow!("missing context"))?;
-        let labels  = self.labels.unwrap_or_default();
+        let theme = self.theme.ok_or_else(|| anyhow::anyhow!("missing theme"))?;
+        let schema = self
+            .schema
+            .ok_or_else(|| anyhow::anyhow!("missing schema"))?;
+        let service = self
+            .service
+            .ok_or_else(|| anyhow::anyhow!("missing service"))?;
+        let ctx = self.ctx.ok_or_else(|| anyhow::anyhow!("missing context"))?;
+        let labels = self.labels.unwrap_or_default();
 
         let mut registry = TuiRegistry::new();
         for extension in self.extensions {
             extension.register(&mut registry);
         }
 
-        let build_ctx = TuiBuildCtx { schema: &schema, ctx: &ctx };
+        let build_ctx = TuiBuildCtx {
+            schema: &schema,
+            ctx: &ctx,
+        };
         let mut custom_screens: HashMap<String, Arc<dyn ScreenFactory>> = HashMap::new();
         for screen in registry.screens {
             custom_screens.insert(screen.id().to_string(), Arc::from(screen));
@@ -350,7 +389,9 @@ impl TuiAppBuilder {
             match custom_screens.get(default_screen) {
                 Some(factory) => factory.build(&build_ctx),
                 None => ResourceScreen::from_app_schema_with_labels(
-                    &schema, Some(default_screen), labels.clone(),
+                    &schema,
+                    Some(default_screen),
+                    labels.clone(),
                 ),
             }
         } else {

@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tku-core    = { path = "../../src/tku-core" }   # adjust once published
-tku-tui     = { path = "../../src/tku-tui" }
-tku-macros  = { path = "../../src/tku-macros" }
+tku-core    = "0.1.0"
+tku-tui     = "0.1.0"
+tku-macros  = "0.1.0"
 tokio         = { version = "1", features = ["full"] }
 serde         = { version = "1", features = ["derive"] }
 clap          = { version = "4", features = ["derive"] }
@@ -15,4 +15,4 @@ async-trait   = "0.1"
 anyhow        = "1"
 
 [build-dependencies]
-tku-codegen = { path = "../../src/tku-codegen" }
+tku-codegen = "0.1.0"

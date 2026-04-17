@@ -5,6 +5,13 @@ version.workspace    = true
 edition.workspace    = true
 authors.workspace    = true
 license.workspace    = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/tku-core"
+readme = "../README.md"
+rust-version.workspace = true
+keywords = ["cli", "framework", "codegen", "tui", "rust"]
+categories = ["command-line-interface", "development-tools"]
 
 [dependencies]
 tokio.workspace       = true

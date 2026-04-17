@@ -21,12 +21,15 @@ pub type BoxFuture<'a> = Pin<Box<dyn Future<Output = TkucliResult<BoxRender>> + 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct HandlerMeta {
     pub resource: String,
-    pub verb:     String,
+    pub verb: String,
 }
 
 impl HandlerMeta {
     pub fn new(resource: impl Into<String>, verb: impl Into<String>) -> Self {
-        Self { resource: resource.into(), verb: verb.into() }
+        Self {
+            resource: resource.into(),
+            verb: verb.into(),
+        }
     }
 
     /// Dot-notation registry key, e.g. "users.list".
@@ -54,9 +57,9 @@ pub trait ErasedHandler: Send + Sync {
 /// simplified to a single args struct.
 pub struct TypedHandler<F, A, O> {
     meta: HandlerMeta,
-    f:    Arc<F>,
-    _a:   std::marker::PhantomData<fn() -> A>,
-    _o:   std::marker::PhantomData<fn() -> O>,
+    f: Arc<F>,
+    _a: std::marker::PhantomData<fn() -> A>,
+    _o: std::marker::PhantomData<fn() -> O>,
 }
 
 impl<F, A, O> TypedHandler<F, A, O> {
@@ -73,9 +76,9 @@ impl<F, A, O> TypedHandler<F, A, O> {
 #[async_trait]
 impl<F, A, O, Fut> ErasedHandler for TypedHandler<F, A, O>
 where
-    F:   Fn(Ctx, A) -> Fut + Send + Sync + 'static,
-    A:   FromArgs + Send + 'static,
-    O:   IntoOutput + 'static,
+    F: Fn(Ctx, A) -> Fut + Send + Sync + 'static,
+    A: FromArgs + Send + 'static,
+    O: IntoOutput + 'static,
     Fut: Future<Output = TkucliResult<O>> + Send + 'static,
 {
     fn meta(&self) -> &HandlerMeta {
@@ -110,9 +113,9 @@ where
 /// ```
 pub fn handler_fn<F, A, O, Fut>(meta: HandlerMeta, f: F) -> Box<dyn ErasedHandler>
 where
-    F:   Fn(Ctx, A) -> Fut + Send + Sync + 'static,
-    A:   FromArgs + Send + 'static,
-    O:   IntoOutput + 'static,
+    F: Fn(Ctx, A) -> Fut + Send + Sync + 'static,
+    A: FromArgs + Send + 'static,
+    O: IntoOutput + 'static,
     Fut: Future<Output = TkucliResult<O>> + Send + 'static,
 {
     Box::new(TypedHandler::new(meta, f))
@@ -126,7 +129,9 @@ pub struct HandlerRegistry {
 }
 
 impl HandlerRegistry {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Panics on duplicate keys — misconfiguration should surface at startup.
     pub fn register(&mut self, handler: Box<dyn ErasedHandler>) {
@@ -154,10 +159,10 @@ impl HandlerRegistry {
 /// Passed through the middleware chain and ultimately consumed by the router.
 #[derive(Clone)]
 pub struct CliRequest {
-    pub ctx:      Ctx,
+    pub ctx: Ctx,
     pub resource: String,
-    pub verb:     String,
-    pub args:     ParsedArgs,
+    pub verb: String,
+    pub args: ParsedArgs,
 }
 
 impl CliRequest {
@@ -167,7 +172,12 @@ impl CliRequest {
         verb: impl Into<String>,
         args: ParsedArgs,
     ) -> Self {
-        Self { ctx, resource: resource.into(), verb: verb.into(), args }
+        Self {
+            ctx,
+            resource: resource.into(),
+            verb: verb.into(),
+            args,
+        }
     }
 }
 
@@ -185,19 +195,18 @@ pub struct RouterService {
 
 impl RouterService {
     pub fn new(registry: HandlerRegistry) -> Self {
-        Self { registry: Arc::new(registry) }
+        Self {
+            registry: Arc::new(registry),
+        }
     }
 }
 
 #[async_trait]
 impl CliService for RouterService {
     async fn call(&self, req: CliRequest) -> TkucliResult<BoxRender> {
-        let handler = self
-            .registry
-            .get(&req.resource, &req.verb)
-            .ok_or_else(|| {
-                TkucliError::CommandNotFound(format!("{} {}", req.resource, req.verb))
-            })?;
+        let handler = self.registry.get(&req.resource, &req.verb).ok_or_else(|| {
+            TkucliError::CommandNotFound(format!("{} {}", req.resource, req.verb))
+        })?;
 
         handler.call(&req.ctx, req.args).await
     }

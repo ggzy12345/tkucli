@@ -20,7 +20,7 @@ use crate::context::Ctx;
 /// }
 /// ```
 pub struct TaskSpinner<'a> {
-    ctx:     &'a Ctx,
+    ctx: &'a Ctx,
     spinner: Option<cliclack::ProgressBar>,
 }
 

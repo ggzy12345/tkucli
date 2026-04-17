@@ -1,3 +1,4 @@
 .DS_Store
 src/target/
 examples/example-spinner-for-cmd-tui/target/
+examples/example-root-resource-subresource/target/

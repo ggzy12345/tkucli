@@ -1,5 +1,5 @@
-use tku_core::schema::{AppSchema, ArgType, ResourceSchema};
 use std::collections::HashSet;
+use tku_core::schema::{AppSchema, ArgType, ResourceSchema};
 
 pub struct SchemaValidator<'a> {
     schema: &'a AppSchema,
@@ -34,8 +34,12 @@ impl<'a> SchemaValidator<'a> {
     /// A root verb must not shadow a top-level resource name, because both
     /// live as direct variants of the generated `Commands` enum.
     fn check_root_vs_resource_collisions(&self) -> anyhow::Result<()> {
-        let resource_names: std::collections::HashSet<&str> =
-            self.schema.resources.iter().map(|r| r.name.as_str()).collect();
+        let resource_names: std::collections::HashSet<&str> = self
+            .schema
+            .resources
+            .iter()
+            .map(|r| r.name.as_str())
+            .collect();
         for op in &self.schema.root.operations {
             if resource_names.contains(op.verb.as_str()) {
                 anyhow::bail!(
@@ -139,8 +143,11 @@ impl<'a> SchemaValidator<'a> {
             path.push(resource.name.clone());
             let resource_path = path.join(".");
 
-            let operation_names: HashSet<&str> =
-                resource.operations.iter().map(|op| op.verb.as_str()).collect();
+            let operation_names: HashSet<&str> = resource
+                .operations
+                .iter()
+                .map(|op| op.verb.as_str())
+                .collect();
             for child in &resource.subresources {
                 if operation_names.contains(child.name.as_str()) {
                     anyhow::bail!(

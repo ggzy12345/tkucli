@@ -4,16 +4,14 @@ mod validator;
 pub use generator::CodeGenerator;
 pub use validator::SchemaValidator;
 
-use tku_core::schema::AppSchema;
 use std::path::{Path, PathBuf};
+use tku_core::schema::AppSchema;
 
 /// Main entry point — call from your project's `build.rs`.
 ///
 /// ```rust,no_run
 /// // build.rs
-/// fn main() {
-///     tku_codegen::build("cli.toml").unwrap();
-/// }
+/// tku_codegen::build("cli.toml").unwrap();
 /// ```
 pub fn build(config_path: impl AsRef<Path>) -> anyhow::Result<()> {
     let config_path = config_path.as_ref();

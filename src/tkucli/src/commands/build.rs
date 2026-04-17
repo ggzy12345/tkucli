@@ -14,8 +14,8 @@ pub struct BuildArgs {
 pub async fn run(args: BuildArgs) -> anyhow::Result<()> {
     println!("⚙  Reading {}", args.config.display());
 
-    let schema = tku_core::schema::AppSchema::from_file(&args.config)
-        .map_err(|e| anyhow::anyhow!(e))?;
+    let schema =
+        tku_core::schema::AppSchema::from_file(&args.config).map_err(|e| anyhow::anyhow!(e))?;
 
     tku_codegen::SchemaValidator::new(&schema).validate()?;
 

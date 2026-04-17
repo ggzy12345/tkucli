@@ -41,9 +41,9 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     match cli.command {
-        Commands::New(args)   => commands::new::run(args).await,
+        Commands::New(args) => commands::new::run(args).await,
         Commands::Build(args) => commands::build::run(args).await,
         Commands::Check(args) => commands::check::run(args).await,
-        Commands::Init(args)  => commands::init::run(args).await,
+        Commands::Init(args) => commands::init::run(args).await,
     }
 }

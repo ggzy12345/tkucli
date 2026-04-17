@@ -1,10 +1,10 @@
 use crate::screen::Screen;
-use tku_core::{context::Ctx, schema::AppSchema};
 use std::collections::HashMap;
+use tku_core::{context::Ctx, schema::AppSchema};
 
 pub struct TuiBuildCtx<'a> {
     pub schema: &'a AppSchema,
-    pub ctx:    &'a Ctx,
+    pub ctx: &'a Ctx,
 }
 
 pub trait ScreenFactory: Send + Sync {
@@ -23,13 +23,13 @@ pub trait TuiExtension: Send + Sync {
 
 #[derive(Clone, Default)]
 pub struct PaletteItem {
-    pub id:          String,
-    pub title:       String,
+    pub id: String,
+    pub title: String,
     pub description: Option<String>,
-    pub resource:    String,
-    pub verb:        String,
-    pub positional:  Vec<String>,
-    pub flags:       HashMap<String, String>,
+    pub resource: String,
+    pub verb: String,
+    pub positional: Vec<String>,
+    pub flags: HashMap<String, String>,
 }
 
 impl PaletteItem {
@@ -68,8 +68,8 @@ impl PaletteItem {
 
 pub struct TuiRegistry {
     pub(crate) default_screen: Option<String>,
-    pub(crate) screens:        Vec<Box<dyn ScreenFactory>>,
-    pub(crate) palette_items:  Vec<PaletteItem>,
+    pub(crate) screens: Vec<Box<dyn ScreenFactory>>,
+    pub(crate) palette_items: Vec<PaletteItem>,
 }
 
 impl TuiRegistry {

@@ -21,7 +21,7 @@ use std::sync::Arc;
 /// ```
 pub struct Router {
     registry: HandlerRegistry,
-    builder:  ServiceBuilder,
+    builder: ServiceBuilder,
 }
 
 impl Router {

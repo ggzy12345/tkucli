@@ -31,7 +31,9 @@ impl ParsedArgs {
 
     /// Get a flag by name, returning an error if it's missing.
     pub fn require(&self, key: &str) -> TkucliResult<&ArgValue> {
-        self.flags.get(key).ok_or_else(|| TkucliError::MissingArgument(key.to_owned()))
+        self.flags
+            .get(key)
+            .ok_or_else(|| TkucliError::MissingArgument(key.to_owned()))
     }
 
     /// Get an optional flag by name.
@@ -199,19 +201,23 @@ impl FromArgs for String {
 
 impl FromArgs for u64 {
     fn from_args(args: &ParsedArgs) -> TkucliResult<Self> {
-        args.positional(0)?.parse().map_err(|_| TkucliError::InvalidArgument {
-            name: "positional[0]".into(),
-            reason: "expected u64".into(),
-        })
+        args.positional(0)?
+            .parse()
+            .map_err(|_| TkucliError::InvalidArgument {
+                name: "positional[0]".into(),
+                reason: "expected u64".into(),
+            })
     }
 }
 
 impl FromArgs for u32 {
     fn from_args(args: &ParsedArgs) -> TkucliResult<Self> {
-        args.positional(0)?.parse().map_err(|_| TkucliError::InvalidArgument {
-            name: "positional[0]".into(),
-            reason: "expected u32".into(),
-        })
+        args.positional(0)?
+            .parse()
+            .map_err(|_| TkucliError::InvalidArgument {
+                name: "positional[0]".into(),
+                reason: "expected u32".into(),
+            })
     }
 }
 

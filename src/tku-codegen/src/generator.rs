@@ -1,6 +1,6 @@
-use tku_core::schema::{AppSchema, ArgType, FlagSchema, OperationSchema, ResourceSchema};
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
+use tku_core::schema::{AppSchema, ArgType, FlagSchema, OperationSchema, ResourceSchema};
 
 pub struct CodeGenerator<'a> {
     schema: &'a AppSchema,
@@ -21,7 +21,10 @@ impl<'a> CodeGenerator<'a> {
         vec![
             ("commands.rs".into(), self.fmt(self.gen_commands())),
             ("args.rs".into(), self.fmt(self.gen_args())),
-            ("handler_traits.rs".into(), self.fmt(self.gen_handler_traits())),
+            (
+                "handler_traits.rs".into(),
+                self.fmt(self.gen_handler_traits()),
+            ),
             ("router.rs".into(), self.fmt(self.gen_router())),
         ]
     }
@@ -69,7 +72,7 @@ impl<'a> CodeGenerator<'a> {
             .schema
             .resources
             .iter()
-            .map(|resource| self.resource_variant(&[resource.name.clone()], resource))
+            .map(|resource| self.resource_variant(std::slice::from_ref(&resource.name), resource))
             .collect();
         let resource_enums: Vec<_> = self
             .schema
@@ -81,7 +84,9 @@ impl<'a> CodeGenerator<'a> {
             .schema
             .resources
             .iter()
-            .map(|resource| self.resource_dispatch_arm(&[resource.name.clone()], resource))
+            .map(|resource| {
+                self.resource_dispatch_arm(std::slice::from_ref(&resource.name), resource)
+            })
             .collect();
 
         // Root dispatch arms — match directly on Commands::<Verb>(args).
@@ -133,7 +138,11 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn resource_enums(&self, resource: &ResourceSchema, mut parent_path: Vec<String>) -> Vec<TokenStream> {
+    fn resource_enums(
+        &self,
+        resource: &ResourceSchema,
+        mut parent_path: Vec<String>,
+    ) -> Vec<TokenStream> {
         parent_path.push(resource.name.clone());
         let mut enums = vec![self.resource_enum(&parent_path, resource)];
         for child in &resource.subresources {
@@ -191,7 +200,7 @@ impl<'a> CodeGenerator<'a> {
         let op_arms: Vec<_> = resource
             .operations
             .iter()
-            .map(|op| self.operation_dispatch_arm(&path, op))
+            .map(|op| self.operation_dispatch_arm(path, op))
             .collect();
         let subresource_arms: Vec<_> = resource
             .subresources
@@ -207,7 +216,11 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn subresource_dispatch_arm(&self, parent_path: &[String], resource: &ResourceSchema) -> TokenStream {
+    fn subresource_dispatch_arm(
+        &self,
+        parent_path: &[String],
+        resource: &ResourceSchema,
+    ) -> TokenStream {
         let variant_ident = pascal_ident(&resource.name);
         let parent_enum_ident = resource_commands_ident(parent_path);
         let mut path = parent_path.to_vec();
@@ -460,7 +473,8 @@ impl<'a> CodeGenerator<'a> {
                 let name = &f.name;
                 let default = f.default.as_deref();
                 let parse_value = arg_value_parse_expr(&quote!(value), &f.arg_type);
-                let parse_required = arg_value_parse_expr(&quote!(args.require(#name)?), &f.arg_type);
+                let parse_required =
+                    arg_value_parse_expr(&quote!(args.require(#name)?), &f.arg_type);
                 let parse_optional = arg_value_parse_expr(&quote!(value), &f.arg_type);
 
                 if f.required {
@@ -767,11 +781,16 @@ fn resource_commands_ident(path: &[String]) -> Ident {
 }
 
 fn path_pascal(path: &[String]) -> String {
-    path.iter().map(|segment| pascal(segment)).collect::<String>()
+    path.iter()
+        .map(|segment| pascal(segment))
+        .collect::<String>()
 }
 
 fn path_snake(path: &[String]) -> String {
-    path.iter().map(|segment| snake(segment)).collect::<Vec<_>>().join("_")
+    path.iter()
+        .map(|segment| snake(segment))
+        .collect::<Vec<_>>()
+        .join("_")
 }
 
 fn arg_rust_type(t: &ArgType, optional: bool) -> TokenStream {

@@ -47,7 +47,7 @@ impl fmt::Display for RenderFormat {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Table => write!(f, "table"),
-            Self::Json  => write!(f, "json"),
+            Self::Json => write!(f, "json"),
             Self::Plain => write!(f, "plain"),
             Self::Quiet => write!(f, "quiet"),
         }
@@ -59,10 +59,10 @@ impl std::str::FromStr for RenderFormat {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             "table" => Ok(Self::Table),
-            "json"  => Ok(Self::Json),
+            "json" => Ok(Self::Json),
             "plain" => Ok(Self::Plain),
             "quiet" => Ok(Self::Quiet),
-            other   => Err(format!("unknown format: {other}")),
+            other => Err(format!("unknown format: {other}")),
         }
     }
 }
@@ -72,13 +72,13 @@ impl std::str::FromStr for RenderFormat {
 /// correct variant based on the active `RenderFormat`.
 pub trait Render: Send + Sync {
     fn render_table(&self) -> String;
-    fn render_json(&self)  -> String;
+    fn render_json(&self) -> String;
     fn render_plain(&self) -> String;
 
     fn render(&self, format: RenderFormat) -> String {
         match format {
             RenderFormat::Table => self.render_table(),
-            RenderFormat::Json  => self.render_json(),
+            RenderFormat::Json => self.render_json(),
             RenderFormat::Plain => self.render_plain(),
             RenderFormat::Quiet => String::new(),
         }
@@ -94,14 +94,22 @@ pub struct Success {
 
 impl Success {
     pub fn new(msg: impl Into<String>) -> Self {
-        Self { message: msg.into() }
+        Self {
+            message: msg.into(),
+        }
     }
 }
 
 impl Render for Success {
-    fn render_table(&self) -> String { format!("✓ {}", self.message) }
-    fn render_json(&self)  -> String { format!(r#"{{"ok":true,"message":"{}"}}"#, self.message) }
-    fn render_plain(&self) -> String { self.message.clone() }
+    fn render_table(&self) -> String {
+        format!("✓ {}", self.message)
+    }
+    fn render_json(&self) -> String {
+        format!(r#"{{"ok":true,"message":"{}"}}"#, self.message)
+    }
+    fn render_plain(&self) -> String {
+        self.message.clone()
+    }
 }
 
 /// Generic tabular data wrapper. `T` must be `Serialize` so we can
@@ -122,7 +130,8 @@ impl<T: Serialize + tabled::Tabled + Send + Sync> Render for Table<T> {
     }
 
     fn render_json(&self) -> String {
-        serde_json::to_string_pretty(&self.rows).unwrap_or_else(|e| format!("{{\"error\":\"{e}\"}}"))
+        serde_json::to_string_pretty(&self.rows)
+            .unwrap_or_else(|e| format!("{{\"error\":\"{e}\"}}"))
     }
 
     fn render_plain(&self) -> String {
@@ -142,7 +151,10 @@ pub struct Record {
 impl Record {
     pub fn new(fields: Vec<(impl Into<String>, impl Into<String>)>) -> Self {
         Self {
-            fields: fields.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            fields: fields
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect(),
         }
     }
 }

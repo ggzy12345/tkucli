@@ -35,21 +35,25 @@ impl ProgressSender {
 /// `Clone` is cheap — the inner data is reference-counted.
 #[derive(Clone)]
 pub struct Ctx {
-    inner:    Arc<CtxInner>,
+    inner: Arc<CtxInner>,
     /// Live progress channel, injected by the TUI dispatch loop.
     pub progress: ProgressSender,
 }
 
 struct CtxInner {
-    pub format:   RenderFormat,
+    pub format: RenderFormat,
     pub tui_mode: bool,
-    pub flags:    HashMap<String, String>,
+    pub flags: HashMap<String, String>,
 }
 
 impl Ctx {
     pub fn new(format: RenderFormat, tui_mode: bool, flags: HashMap<String, String>) -> Self {
         Self {
-            inner:    Arc::new(CtxInner { format, tui_mode, flags }),
+            inner: Arc::new(CtxInner {
+                format,
+                tui_mode,
+                flags,
+            }),
             progress: ProgressSender::default(),
         }
     }
@@ -79,9 +83,9 @@ impl Ctx {
 /// Builder for constructing a `Ctx` before dispatch.
 #[derive(Default)]
 pub struct CtxBuilder {
-    format:   RenderFormat,
+    format: RenderFormat,
     tui_mode: bool,
-    flags:    HashMap<String, String>,
+    flags: HashMap<String, String>,
 }
 
 impl CtxBuilder {

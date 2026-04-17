@@ -24,7 +24,7 @@ tkucli/
 ### 1. Install the `tkucli` tool
 
 ```bash
-cargo install --locked --path tkucli
+cargo install tkucli
 ```
 
 ### 2. Create a new project
@@ -33,6 +33,26 @@ cargo install --locked --path tkucli
 tkucli new my-app
 cd my-app
 ```
+
+The generated app should depend on the published crates from crates.io, like the examples in [`examples/`](/Volumes/ORICO/projects/github/tkucli/examples):
+
+```toml
+[dependencies]
+tku-core    = "0.1.0"
+tku-tui     = "0.1.0"
+tku-macros  = "0.1.0"
+tokio       = { version = "1", features = ["full"] }
+serde       = { version = "1", features = ["derive"] }
+clap        = { version = "4", features = ["derive"] }
+tabled      = "0.15"
+async-trait = "0.1"
+anyhow      = "1"
+
+[build-dependencies]
+tku-codegen = "0.1.0"
+```
+
+Use `path = ...` dependencies only when you are developing against this repository locally.
 
 ### 3. Edit `cli.toml`
 

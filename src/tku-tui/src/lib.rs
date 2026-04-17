@@ -1,6 +1,6 @@
 pub mod app;
-pub mod extension;
 pub mod events;
+pub mod extension;
 pub mod screen;
 pub mod theme;
 pub mod widgets;

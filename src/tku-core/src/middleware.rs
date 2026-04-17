@@ -59,7 +59,9 @@ impl ServiceBuilder {
 }
 
 impl Default for ServiceBuilder {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ── Built-in layers ───────────────────────────────────────────────────────────
@@ -109,18 +111,23 @@ pub struct AuthLayer {
 
 impl AuthLayer {
     pub fn from_env(env_var: impl Into<String>) -> Self {
-        Self { env_var: env_var.into() }
+        Self {
+            env_var: env_var.into(),
+        }
     }
 }
 
 impl Layer for AuthLayer {
     fn layer(&self, inner: Arc<dyn CliService>) -> Arc<dyn CliService> {
-        Arc::new(AuthService { inner, env_var: self.env_var.clone() })
+        Arc::new(AuthService {
+            inner,
+            env_var: self.env_var.clone(),
+        })
     }
 }
 
 struct AuthService {
-    inner:   Arc<dyn CliService>,
+    inner: Arc<dyn CliService>,
     env_var: String,
 }
 
@@ -170,8 +177,8 @@ impl Layer for ConfirmLayer {
 }
 
 struct ConfirmService {
-    inner:             Arc<dyn CliService>,
-    requires_confirm:  std::collections::HashSet<String>,
+    inner: Arc<dyn CliService>,
+    requires_confirm: std::collections::HashSet<String>,
 }
 
 #[async_trait]
@@ -181,7 +188,10 @@ impl CliService for ConfirmService {
 
         let key = format!("{}.{}", req.resource, req.verb);
         if self.requires_confirm.contains(&key) {
-            eprint!("  Are you sure you want to run `{} {}`? [y/N] ", req.resource, req.verb);
+            eprint!(
+                "  Are you sure you want to run `{} {}`? [y/N] ",
+                req.resource, req.verb
+            );
 
             let mut input = String::new();
             std::io::stdin().read_line(&mut input).ok();

@@ -5,9 +5,16 @@ version.workspace  = true
 edition.workspace  = true
 authors.workspace  = true
 license.workspace  = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/tku-codegen"
+readme = "../README.md"
+rust-version.workspace = true
+keywords = ["cli", "codegen", "build", "generator", "rust"]
+categories = ["command-line-interface", "development-tools::build-utils"]
 
 [dependencies]
-tku-core              = { path = "../tku-core" }
+tku-core              = { version = "0.1.0", path = "../tku-core" }
 proc-macro2.workspace = true
 quote.workspace       = true
 syn.workspace         = true

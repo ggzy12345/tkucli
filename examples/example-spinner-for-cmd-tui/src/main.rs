@@ -68,6 +68,8 @@ async fn main() -> anyhow::Result<()> {
                     .labels(ScreenLabels {
                         running: "working…".to_string(),
                         latest:  "done".to_string(),
+                        welcome_title: "Welcome to VM CLI".to_string(),
+                        welcome_body: "Press 'q' to quit".to_string(),
                         })
                     .build()?;
         return app.run().await;

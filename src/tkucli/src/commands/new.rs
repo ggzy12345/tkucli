@@ -19,16 +19,9 @@ pub struct NewArgs {
 pub async fn run(args: NewArgs) -> anyhow::Result<()> {
     let root = args.path.unwrap_or_else(|| PathBuf::from(&args.name));
     let name = &args.name;
+    let framework_version = env!("CARGO_PKG_VERSION");
     let use_subresource_example = args.subresource_example;
     let use_root_example = args.root_example;
-    let workspace_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .expect("tkucli should live under the workspace root")
-        .to_path_buf();
-    let tku_core_path = workspace_root.join("tku-core");
-    let tku_tui_path = workspace_root.join("tku-tui");
-    let tku_macros_path = workspace_root.join("tku-macros");
-    let tku_codegen_path = workspace_root.join("tku-codegen");
 
     println!(
         "🔨 Creating new Tkucli project `{name}` at {}",
@@ -47,9 +40,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tku-core    = {{ path = "{}" }}   # adjust once published
-tku-tui     = {{ path = "{}" }}
-tku-macros  = {{ path = "{}" }}
+tku-core      = "{framework_version}"
+tku-tui       = "{framework_version}"
+tku-macros    = "{framework_version}"
 tokio         = {{ version = "1", features = ["full"] }}
 serde         = {{ version = "1", features = ["derive"] }}
 clap          = {{ version = "4", features = ["derive"] }}
@@ -58,12 +51,8 @@ async-trait   = "0.1"
 anyhow        = "1"
 
 [build-dependencies]
-tku-codegen = {{ path = "{}" }}
+tku-codegen = "{framework_version}"
 "#,
-            tku_core_path.display(),
-            tku_tui_path.display(),
-            tku_macros_path.display(),
-            tku_codegen_path.display(),
         ),
     )?;
 
@@ -188,8 +177,7 @@ description = "Example resource — replace with your own"
     std::fs::write(
         root.join("src/main.rs"),
         if use_root_example {
-            format!(
-                r#"mod handlers;
+            r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -263,10 +251,9 @@ async fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#
-            )
+            .to_string()
         } else if use_subresource_example {
-            format!(
-                r#"mod handlers;
+            r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -346,10 +333,9 @@ async fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#
-            )
+            .to_string()
         } else {
-            format!(
-                r#"mod handlers;
+            r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -425,7 +411,7 @@ async fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#
-            )
+            .to_string()
         },
     )?;
 
