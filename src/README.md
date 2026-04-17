@@ -24,7 +24,7 @@ tkucli/
 ### 1. Install the `tkucli` tool
 
 ```bash
-cargo install --path tkucli
+cargo install --locked --path tkucli
 ```
 
 ### 2. Create a new project

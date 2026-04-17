@@ -15,6 +15,8 @@ use std::collections::HashMap;
 ///     .labels(ScreenLabels {
 ///         running: "working…".to_string(),
 ///         latest:  "done".to_string(),
+///         welcome_title: "my-app".to_string(),
+///         welcome_body: "Welcome to my-app.".to_string(),
 ///     })
 /// ```
 #[derive(Clone)]
@@ -25,6 +27,10 @@ pub struct ScreenLabels {
     /// Text shown on the most-recently-completed (non-pending) entry.
     /// Default: `"latest"`
     pub latest: String,
+    /// Title shown in the initial welcome transcript bubble.
+    pub welcome_title: String,
+    /// Body shown in the initial welcome transcript bubble.
+    pub welcome_body: String,
 }
 
 impl Default for ScreenLabels {
@@ -32,6 +38,13 @@ impl Default for ScreenLabels {
         Self {
             running: "running".to_string(),
             latest:  "latest".to_string(),
+            welcome_title: "tkucli".to_string(),
+            welcome_body: "Welcome to Tkucli TUI.\n\n\
+                           1. Move through actions below with j/k or the arrow keys.\n\
+                           2. Press Enter to run the selected action.\n\
+                           3. Results will appear here in the same conversation.\n\
+                           4. Use Ctrl-U / Ctrl-D or PageUp / PageDown to scroll through history."
+                .to_string(),
         }
     }
 }
@@ -125,16 +138,11 @@ struct TranscriptEntry {
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum TranscriptRole { User, Assistant, System }
 
-fn welcome_entry() -> TranscriptEntry {
+fn welcome_entry(labels: &ScreenLabels) -> TranscriptEntry {
     TranscriptEntry {
         role:  TranscriptRole::System,
-        title: Some("tkucli".to_string()),
-        body:  "Welcome to Tkucli TUI.\n\n\
-                1. Move through actions below with j/k or the arrow keys.\n\
-                2. Press Enter to run the selected action.\n\
-                3. Results will appear here in the same conversation.\n\
-                4. Use Ctrl-U / Ctrl-D or PageUp / PageDown to scroll through history."
-            .to_string(),
+        title: Some(labels.welcome_title.clone()),
+        body: labels.welcome_body.clone(),
         pending:       false,
         pending_frame: 0,
     }
@@ -189,7 +197,7 @@ impl ResourceScreen {
             selected_operation: 0,
             composer:           None,
             prompt_message:     None,
-            transcript:         vec![welcome_entry()],
+            transcript:         vec![welcome_entry(&ScreenLabels::default())],
             scroll:             0,
             content_lines:      0,
             viewport_lines:     0,
@@ -220,7 +228,7 @@ impl ResourceScreen {
             selected_operation: 0,
             composer:           None,
             prompt_message:     None,
-            transcript:         vec![welcome_entry()],
+            transcript:         vec![welcome_entry(&labels)],
             scroll:             0,
             content_lines:      0,
             viewport_lines:     0,

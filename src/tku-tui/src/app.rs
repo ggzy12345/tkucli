@@ -315,6 +315,8 @@ impl TuiAppBuilder {
     ///     .labels(ScreenLabels {
     ///         running: "working…".to_string(),
     ///         latest:  "done".to_string(),
+    ///         welcome_title: "my-app".to_string(),
+    ///         welcome_body: "Welcome to my-app.".to_string(),
     ///     })
     /// ```
     pub fn labels(mut self, labels: ScreenLabels) -> Self {
