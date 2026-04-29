@@ -1,7 +1,8 @@
 use crate::{
     events::{spawn_event_loop, AppEvent},
     extension::{PaletteItem, ScreenFactory, TuiBuildCtx, TuiExtension, TuiRegistry},
-    screen::{PaletteScreen, ResourceScreen, Screen, ScreenAction, ScreenLabels},
+    profile::BuiltinTuiProfile,
+    screen::{PaletteScreen, Screen, ScreenAction, ScreenLabels},
     theme::Theme,
     widgets::StatusBar,
 };
@@ -40,7 +41,6 @@ pub struct TuiAppBuilder {
     service: Option<Arc<dyn CliService>>,
     ctx: Option<Ctx>,
     extensions: Vec<Box<dyn TuiExtension>>,
-    /// Optional label overrides. Falls back to `ScreenLabels::default()`.
     labels: Option<ScreenLabels>,
 }
 
@@ -75,17 +75,33 @@ impl TuiApp {
         }
     }
 
+    /// Convenience constructor. Reads `schema.tui.default_profile` to select the
+    /// appropriate built-in screen layout (`"default"` or `"coder"`) and resolves
+    /// profile labels so welcome text and status strings are applied correctly.
     pub fn from_schema(
         theme: Theme,
         schema: &AppSchema,
         service: Arc<dyn CliService>,
         ctx: Ctx,
     ) -> Self {
+        let resolved = schema
+            .resolve_tui_profile(schema.tui.default_profile.as_deref())
+            .unwrap_or_else(|_| {
+                schema
+                    .resolve_tui_profile(None)
+                    .expect("default profile resolution cannot fail")
+            });
+        let labels = ScreenLabels {
+            latest: Some(resolved.labels.latest),
+            welcome_title: Some(resolved.labels.welcome_title),
+            welcome_body: Some(resolved.labels.welcome_body),
+        };
         Self::builder()
             .theme(theme)
             .schema(schema.clone())
             .service(service)
             .ctx(ctx)
+            .labels(labels)
             .build()
             .expect("TuiApp::from_schema requires a complete builder")
     }
@@ -152,14 +168,18 @@ impl TuiApp {
         status_bar: &mut StatusBar,
     ) -> anyhow::Result<()> {
         term.draw(|frame| {
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints([Constraint::Min(1), Constraint::Length(1)])
-                .split(frame.size());
             if let Some(screen) = screen_stack.last_mut() {
-                screen.render(frame, chunks[0], theme);
-                let title = screen.title().to_owned();
-                status_bar.render(frame, chunks[1], theme, &title);
+                if screen.shows_status_bar() {
+                    let chunks = Layout::default()
+                        .direction(Direction::Vertical)
+                        .constraints([Constraint::Min(1), Constraint::Length(1)])
+                        .split(frame.size());
+                    screen.render(frame, chunks[0], theme);
+                    let title = screen.title().to_owned();
+                    status_bar.render(frame, chunks[1], theme, &title);
+                } else {
+                    screen.render(frame, frame.size(), theme);
+                }
             }
         })?;
         Ok(())
@@ -338,18 +358,6 @@ impl TuiAppBuilder {
         self.extensions.push(Box::new(extension));
         self
     }
-
-    /// Override the default `"running"` / `"latest"` header labels.
-    ///
-    /// ```rust,ignore
-    /// TuiApp::builder()
-    ///     .labels(ScreenLabels {
-    ///         running: "working…".to_string(),
-    ///         latest:  "done".to_string(),
-    ///         welcome_title: "my-app".to_string(),
-    ///         welcome_body: "Welcome to my-app.".to_string(),
-    ///     })
-    /// ```
     pub fn labels(mut self, labels: ScreenLabels) -> Self {
         self.labels = Some(labels);
         self
@@ -380,22 +388,16 @@ impl TuiAppBuilder {
             custom_screens.insert(screen.id().to_string(), Arc::from(screen));
         }
 
-        let default_screen = registry
-            .default_screen
-            .clone()
-            .or_else(|| schema.tui.default_screen.clone());
+        // Check for a custom screen override first, then fall back to the
+        // selected built-in profile renderer.
+        let profile_name = schema.tui.default_profile.as_deref().unwrap_or("default");
+        let builtin_profile = BuiltinTuiProfile::from_name(schema.tui.default_profile.as_deref())
+            .unwrap_or(BuiltinTuiProfile::Default);
+        let theme = builtin_profile.apply_theme(theme);
 
-        let initial_screen = if let Some(default_screen) = default_screen.as_deref() {
-            match custom_screens.get(default_screen) {
-                Some(factory) => factory.build(&build_ctx),
-                None => ResourceScreen::from_app_schema_with_labels(
-                    &schema,
-                    Some(default_screen),
-                    labels.clone(),
-                ),
-            }
-        } else {
-            ResourceScreen::from_app_schema_with_labels(&schema, None, labels.clone())
+        let initial_screen: Box<dyn Screen> = match custom_screens.get(profile_name) {
+            Some(factory) => factory.build(&build_ctx),
+            None => builtin_profile.build_initial_screen(&schema, labels),
         };
 
         Ok(TuiApp::new(

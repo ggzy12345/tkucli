@@ -16,7 +16,8 @@ default_output = "table"
 
 [tui]
 enabled = true
-theme   = "dark"
+theme   = "dark"     # dark | light
+profile = "default"  # default | coder
 
 # Optional: operations with no resource prefix (my-app list, my-app deploy …)
 # [root]

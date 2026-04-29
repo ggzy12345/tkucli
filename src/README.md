@@ -1,8 +1,8 @@
-# tkucli
+# Tkucli
 
 **A resource-oriented CLI framework for Rust**, inspired by web frameworks like Express and Spring.
 
-Define your CLI in a single `cli.toml` config file. Tkucli generates the command tree, argument parsers, handler trait stubs, and an interactive Ratatui TUI so you can focus on business logic.
+Define your CLI in a single `cli.toml` config file. Tkucli generates the entire command tree, argument parsers, handler trait stubs, and an interactive Ratatui TUI — you write only the business logic.
 
 ---
 
@@ -24,7 +24,7 @@ tkucli/
 ### 1. Install the `tkucli` tool
 
 ```bash
-cargo install tkucli
+cargo install --locked --path tkucli
 ```
 
 ### 2. Create a new project
@@ -152,9 +152,7 @@ For `enum`, also provide `values = ["a", "b", "c"]`.
 | `tku-macros`  | `#[tkucli::handler]` attribute, `tkucli::register!()` macro       |
 | `tkucli`     | `tkucli new`, `tkucli build`, `tkucli check`, `tkucli init`         |
 
-## Status
-
-tkucli is early-stage software and APIs may change as the framework evolves.
+---
 
 ## Roadmap
 

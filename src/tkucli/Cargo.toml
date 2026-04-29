@@ -5,21 +5,14 @@ version.workspace  = true
 edition.workspace  = true
 authors.workspace  = true
 license.workspace  = true
-repository.workspace = true
-homepage.workspace = true
-documentation.workspace = true
-readme = "../README.md"
-rust-version.workspace = true
-keywords = ["cli", "framework", "generator", "tui", "rust"]
-categories = ["command-line-interface", "development-tools"]
 
 [[bin]]
 name = "tkucli"
 path = "src/main.rs"
 
 [dependencies]
-tku-core              = { version = "0.1.0", path = "../tku-core" }
-tku-codegen           = { version = "0.1.0", path = "../tku-codegen" }
+tku-core              = { path = "../tku-core" }
+tku-codegen           = { path = "../tku-codegen" }
 clap.workspace        = true
 tokio.workspace       = true
 serde.workspace       = true

@@ -4,6 +4,7 @@ use tku_core::schema::{AppSchema, ArgType, FlagSchema, OperationSchema, Resource
 
 pub struct CodeGenerator<'a> {
     schema: &'a AppSchema,
+    selected_tui_profile: Option<String>,
 }
 
 #[derive(Clone)]
@@ -13,8 +14,11 @@ struct ResourceNode<'a> {
 }
 
 impl<'a> CodeGenerator<'a> {
-    pub fn new(schema: &'a AppSchema) -> Self {
-        Self { schema }
+    pub fn new(schema: &'a AppSchema, selected_tui_profile: Option<String>) -> Self {
+        Self {
+            schema,
+            selected_tui_profile,
+        }
     }
 
     pub fn generate_all(&self) -> Vec<(String, String)> {
@@ -26,6 +30,7 @@ impl<'a> CodeGenerator<'a> {
                 self.fmt(self.gen_handler_traits()),
             ),
             ("router.rs".into(), self.fmt(self.gen_router())),
+            ("tui.rs".into(), self.fmt(self.gen_tui())),
         ]
     }
 
@@ -72,7 +77,7 @@ impl<'a> CodeGenerator<'a> {
             .schema
             .resources
             .iter()
-            .map(|resource| self.resource_variant(std::slice::from_ref(&resource.name), resource))
+            .map(|resource| self.resource_variant(&[resource.name.clone()], resource))
             .collect();
         let resource_enums: Vec<_> = self
             .schema
@@ -84,9 +89,7 @@ impl<'a> CodeGenerator<'a> {
             .schema
             .resources
             .iter()
-            .map(|resource| {
-                self.resource_dispatch_arm(std::slice::from_ref(&resource.name), resource)
-            })
+            .map(|resource| self.resource_dispatch_arm(&[resource.name.clone()], resource))
             .collect();
 
         // Root dispatch arms — match directly on Commands::<Verb>(args).
@@ -200,7 +203,7 @@ impl<'a> CodeGenerator<'a> {
         let op_arms: Vec<_> = resource
             .operations
             .iter()
-            .map(|op| self.operation_dispatch_arm(path, op))
+            .map(|op| self.operation_dispatch_arm(&path, op))
             .collect();
         let subresource_arms: Vec<_> = resource
             .subresources
@@ -386,6 +389,62 @@ impl<'a> CodeGenerator<'a> {
 
             #(#root_args)*
             #(#all)*
+        }
+    }
+
+    fn gen_tui(&self) -> TokenStream {
+        let resolved = self
+            .schema
+            .resolve_tui_profile(self.selected_tui_profile.as_deref())
+            .expect("TUI profile should be validated before code generation");
+
+        let profile_name = self
+            .selected_tui_profile
+            .as_deref()
+            .or(self.schema.tui.default_profile.as_deref());
+        let selected_profile = match profile_name {
+            Some(name) => quote! { Some(#name) },
+            None => quote! { None },
+        };
+        let theme = resolved.theme;
+        let default_screen = match resolved.default_screen {
+            Some(screen) => quote! { Some(#screen) },
+            None => quote! { None },
+        };
+        let running = resolved.labels.running;
+        let latest = resolved.labels.latest;
+        let welcome_title = resolved.labels.welcome_title;
+        let welcome_body = resolved.labels.welcome_body;
+
+        quote! {
+            // Generated resolved TUI settings. Do not edit by hand.
+            use tku_core::schema::AppSchema;
+            use tku_tui::screen::ScreenLabels;
+
+            pub const SELECTED_PROFILE: Option<&str> = #selected_profile;
+            pub const THEME_NAME: &str = #theme;
+            pub const DEFAULT_SCREEN: Option<&str> = #default_screen;
+
+            pub fn labels() -> ScreenLabels {
+                ScreenLabels {
+                    running: #running.to_string(),
+                    latest: #latest.to_string(),
+                    welcome_title: #welcome_title.to_string(),
+                    welcome_body: #welcome_body.to_string(),
+                }
+            }
+
+            pub fn resolve_schema(mut schema: AppSchema) -> AppSchema {
+                schema.tui.theme = THEME_NAME.to_string();
+                schema.tui.default_screen = DEFAULT_SCREEN.map(str::to_string);
+                schema.tui.default_profile = SELECTED_PROFILE.map(str::to_string);
+                schema.tui.labels.running = Some(#running.to_string());
+                schema.tui.labels.latest = Some(#latest.to_string());
+                schema.tui.labels.welcome_title = Some(#welcome_title.to_string());
+                schema.tui.labels.welcome_body = Some(#welcome_body.to_string());
+                schema.tui.profiles.clear();
+                schema
+            }
         }
     }
 

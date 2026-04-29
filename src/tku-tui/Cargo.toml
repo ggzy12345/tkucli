@@ -5,16 +5,9 @@ version.workspace  = true
 edition.workspace  = true
 authors.workspace  = true
 license.workspace  = true
-repository.workspace = true
-homepage.workspace = true
-documentation = "https://docs.rs/tku-tui"
-readme = "../README.md"
-rust-version.workspace = true
-keywords = ["cli", "tui", "ratatui", "framework", "rust"]
-categories = ["command-line-interface", "development-tools"]
 
 [dependencies]
-tku-core            = { version = "0.1.0", path = "../tku-core" }
+tku-core            = { path = "../tku-core" }
 ratatui.workspace   = true
 crossterm.workspace = true
 tokio.workspace     = true
@@ -22,3 +15,5 @@ serde.workspace     = true
 thiserror.workspace = true
 anyhow.workspace    = true
 async-trait.workspace = true
+textwrap = "0.16.2"
+arboard.workspace = true

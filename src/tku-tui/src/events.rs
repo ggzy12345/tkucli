@@ -1,4 +1,4 @@
-use crossterm::event::{self, Event as CrossEvent, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{self, Event as CrossEvent, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 use std::time::Duration;
 use tokio::sync::mpsc;
 
@@ -6,6 +6,7 @@ use tokio::sync::mpsc;
 #[derive(Debug, Clone)]
 pub enum AppEvent {
     Key(KeyEvent),
+    Mouse(MouseEvent),
     Tick,
     Resize(u16, u16),
     Quit,
@@ -33,6 +34,9 @@ pub fn spawn_event_loop(tick_ms: u64) -> mpsc::UnboundedReceiver<AppEvent> {
                             break;
                         }
                         let _ = tx.send(AppEvent::Key(k));
+                    }
+                    Ok(CrossEvent::Mouse(m)) => {
+                        let _ = tx.send(AppEvent::Mouse(m));
                     }
                     Ok(CrossEvent::Resize(w, h)) => {
                         let _ = tx.send(AppEvent::Resize(w, h));

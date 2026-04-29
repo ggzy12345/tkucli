@@ -9,6 +9,9 @@ pub struct BuildArgs {
     /// Output directory for generated files
     #[arg(long)]
     pub out_dir: Option<PathBuf>,
+    /// Select a named TUI profile to bake into the generated app
+    #[arg(long)]
+    pub tui_profile: Option<String>,
 }
 
 pub async fn run(args: BuildArgs) -> anyhow::Result<()> {
@@ -18,6 +21,9 @@ pub async fn run(args: BuildArgs) -> anyhow::Result<()> {
         tku_core::schema::AppSchema::from_file(&args.config).map_err(|e| anyhow::anyhow!(e))?;
 
     tku_codegen::SchemaValidator::new(&schema).validate()?;
+    schema
+        .resolve_tui_profile(args.tui_profile.as_deref())
+        .map_err(|e| anyhow::anyhow!(e))?;
 
     let out_dir = args
         .out_dir
@@ -25,7 +31,7 @@ pub async fn run(args: BuildArgs) -> anyhow::Result<()> {
 
     std::fs::create_dir_all(&out_dir)?;
 
-    let gen = tku_codegen::CodeGenerator::new(&schema);
+    let gen = tku_codegen::CodeGenerator::new(&schema, args.tui_profile.clone());
     for (filename, content) in gen.generate_all() {
         let dest = out_dir.join(&filename);
         std::fs::write(&dest, &content)?;

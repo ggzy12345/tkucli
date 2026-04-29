@@ -5,7 +5,7 @@ use std::path::PathBuf;
 pub struct NewArgs {
     /// Project name
     pub name: String,
-    /// Directory to create (defaults to `./<name>`)
+    /// Directory to create (defaults to `./<n>`)
     #[arg(long)]
     pub path: Option<PathBuf>,
     /// Scaffold a starter that includes a sub-resource example (`vm disk ...`)
@@ -19,9 +19,16 @@ pub struct NewArgs {
 pub async fn run(args: NewArgs) -> anyhow::Result<()> {
     let root = args.path.unwrap_or_else(|| PathBuf::from(&args.name));
     let name = &args.name;
-    let framework_version = env!("CARGO_PKG_VERSION");
     let use_subresource_example = args.subresource_example;
     let use_root_example = args.root_example;
+    let workspace_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("tkucli should live under the workspace root")
+        .to_path_buf();
+    let tku_core_path    = workspace_root.join("tku-core");
+    let tku_tui_path     = workspace_root.join("tku-tui");
+    let tku_macros_path  = workspace_root.join("tku-macros");
+    let tku_codegen_path = workspace_root.join("tku-codegen");
 
     println!(
         "🔨 Creating new Tkucli project `{name}` at {}",
@@ -40,9 +47,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tku-core      = "{framework_version}"
-tku-tui       = "{framework_version}"
-tku-macros    = "{framework_version}"
+tku-core    = {{ path = "{}" }}   # adjust once published
+tku-tui     = {{ path = "{}" }}
+tku-macros  = {{ path = "{}" }}
 tokio         = {{ version = "1", features = ["full"] }}
 serde         = {{ version = "1", features = ["derive"] }}
 clap          = {{ version = "4", features = ["derive"] }}
@@ -51,8 +58,12 @@ async-trait   = "0.1"
 anyhow        = "1"
 
 [build-dependencies]
-tku-codegen = "{framework_version}"
+tku-codegen = {{ path = "{}" }}
 "#,
+            tku_core_path.display(),
+            tku_tui_path.display(),
+            tku_macros_path.display(),
+            tku_codegen_path.display(),
         ),
     )?;
 
@@ -77,8 +88,9 @@ description    = "A Tkucli-powered CLI"
 default_output = "table"
 
 [tui]
-enabled        = false
-theme          = "dark"
+enabled = false
+theme   = "dark"     # dark | light
+profile = "default"  # default | coder
 
 [root]
 
@@ -104,8 +116,9 @@ description    = "A Tkucli-powered CLI"
 default_output = "table"
 
 [tui]
-enabled        = true
-theme          = "dark"
+enabled = true
+theme   = "dark"     # dark | light
+profile = "default"  # default | coder
 
 [[resource]]
 name        = "vm"
@@ -136,7 +149,7 @@ description = "Virtual machines"
     verb        = "attach"
     description = "Attach a disk to a VM"
     args        = [
-      {{ name = "vm_id", type = "u64", required = true }},
+      {{ name = "vm_id",   type = "u64", required = true }},
       {{ name = "disk_id", type = "u64", required = true }},
     ]
 "#
@@ -150,8 +163,9 @@ description    = "A Tkucli-powered CLI"
 default_output = "table"
 
 [tui]
-enabled        = true
-theme          = "dark"
+enabled = true
+theme   = "dark"     # dark | light
+profile = "default"  # default | coder
 
 [[resource]]
 name        = "example"
@@ -177,7 +191,8 @@ description = "Example resource — replace with your own"
     std::fs::write(
         root.join("src/main.rs"),
         if use_root_example {
-            r#"mod handlers;
+            format!(
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -192,6 +207,9 @@ mod generated {{
     pub mod router {{
         include!(concat!(env!("OUT_DIR"), "/router.rs"));
     }}
+    pub mod tui {{
+        include!(concat!(env!("OUT_DIR"), "/tui.rs"));
+    }}
 }}
 
 use clap::Parser;
@@ -201,7 +219,7 @@ use tku_core::{{
     output::RenderFormat,
     schema::AppSchema,
 }};
-use tku_tui::{{Theme, TuiApp}};
+use tku_tui::{{TuiApp, Theme}};
 use generated::commands::{{Cli, extract_dispatch}};
 use generated::router::{{build_router, Handlers}};
 
@@ -234,15 +252,21 @@ async fn main() -> anyhow::Result<()> {{
     if ctx.tui_mode() {{
         let schema = AppSchema::from_toml(include_str!("../cli.toml"))
             .map_err(anyhow::Error::msg)?;
-        let theme = Theme::from_name(&schema.tui.theme);
-        let app = TuiApp::from_schema(theme, &schema, svc.clone(), ctx.clone());
+        let schema = generated::tui::resolve_schema(schema);
+        let app = TuiApp::builder()
+            .theme(Theme::from_name(generated::tui::THEME_NAME))
+            .schema(schema.clone())
+            .service(svc.clone())
+            .ctx(ctx.clone())
+            .labels(generated::tui::labels())
+            .build()
+            .map_err(anyhow::Error::msg)?;
         return app.run().await;
     }}
 
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
         "a subcommand is required unless --tui is set"
     ))?;
-    // resource will be "$root" for root verbs, a resource name otherwise
     let (resource, verb, args) = extract_dispatch(command);
     let req = CliRequest::new(ctx.clone(), resource, verb, args);
 
@@ -251,9 +275,10 @@ async fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#
-            .to_string()
+            )
         } else if use_subresource_example {
-            r#"mod handlers;
+            format!(
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -268,6 +293,9 @@ mod generated {{
     pub mod router {{
         include!(concat!(env!("OUT_DIR"), "/router.rs"));
     }}
+    pub mod tui {{
+        include!(concat!(env!("OUT_DIR"), "/tui.rs"));
+    }}
 }}
 
 use clap::Parser;
@@ -277,27 +305,22 @@ use tku_core::{{
     output::RenderFormat,
     schema::AppSchema,
 }};
-use tku_tui::{{Theme, TuiApp}};
+use tku_tui::{{TuiApp, Theme}};
 use generated::commands::{{Cli, extract_dispatch}};
 use generated::router::{{build_router, Handlers}};
 
 #[derive(Clone)]
 struct AppHandlers {{
-    vm: handlers::vm::VmHandler,
+    vm:      handlers::vm::VmHandler,
     vm_disk: handlers::vm_disk::VmDiskHandler,
 }}
 
 impl Handlers for AppHandlers {{
-    type VmHandlerType = handlers::vm::VmHandler;
+    type VmHandlerType     = handlers::vm::VmHandler;
     type VmDiskHandlerType = handlers::vm_disk::VmDiskHandler;
 
-    fn vm_handler(&self) -> Self::VmHandlerType {{
-        self.vm.clone()
-    }}
-
-    fn vm_disk_handler(&self) -> Self::VmDiskHandlerType {{
-        self.vm_disk.clone()
-    }}
+    fn vm_handler(&self)      -> Self::VmHandlerType     {{ self.vm.clone() }}
+    fn vm_disk_handler(&self) -> Self::VmDiskHandlerType {{ self.vm_disk.clone() }}
 }}
 
 #[tokio::main]
@@ -310,15 +333,22 @@ async fn main() -> anyhow::Result<()> {{
         .build();
 
     let svc = build_router(AppHandlers {{
-        vm: handlers::vm::VmHandler,
+        vm:      handlers::vm::VmHandler,
         vm_disk: handlers::vm_disk::VmDiskHandler,
     }});
 
     if ctx.tui_mode() {{
         let schema = AppSchema::from_toml(include_str!("../cli.toml"))
             .map_err(anyhow::Error::msg)?;
-        let theme = Theme::from_name(&schema.tui.theme);
-        let app = TuiApp::from_schema(theme, &schema, svc.clone(), ctx.clone());
+        let schema = generated::tui::resolve_schema(schema);
+        let app = TuiApp::builder()
+            .theme(Theme::from_name(generated::tui::THEME_NAME))
+            .schema(schema.clone())
+            .service(svc.clone())
+            .ctx(ctx.clone())
+            .labels(generated::tui::labels())
+            .build()
+            .map_err(anyhow::Error::msg)?;
         return app.run().await;
     }}
 
@@ -333,9 +363,10 @@ async fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#
-            .to_string()
+            )
         } else {
-            r#"mod handlers;
+            format!(
+                r#"mod handlers;
 
 mod generated {{
     pub mod args {{
@@ -350,6 +381,9 @@ mod generated {{
     pub mod router {{
         include!(concat!(env!("OUT_DIR"), "/router.rs"));
     }}
+    pub mod tui {{
+        include!(concat!(env!("OUT_DIR"), "/tui.rs"));
+    }}
 }}
 
 use clap::Parser;
@@ -359,11 +393,10 @@ use tku_core::{{
     output::RenderFormat,
     schema::AppSchema,
 }};
-use tku_tui::{{Theme, TuiApp}};
+use tku_tui::{{TuiApp, Theme}};
 use generated::commands::{{Cli, extract_dispatch}};
 use generated::router::{{build_router, Handlers}};
 
-// Wire all handler impls together.
 #[derive(Clone)]
 struct AppHandlers {{
     example: handlers::example::ExampleHandler,
@@ -386,7 +419,6 @@ async fn main() -> anyhow::Result<()> {{
         .tui_mode(cli.tui)
         .build();
 
-    // Build service stack once at startup.
     let svc = build_router(AppHandlers {{
         example: handlers::example::ExampleHandler,
     }});
@@ -394,12 +426,18 @@ async fn main() -> anyhow::Result<()> {{
     if ctx.tui_mode() {{
         let schema = AppSchema::from_toml(include_str!("../cli.toml"))
             .map_err(anyhow::Error::msg)?;
-        let theme = Theme::from_name(&schema.tui.theme);
-        let app = TuiApp::from_schema(theme, &schema, svc.clone(), ctx.clone());
+        let schema = generated::tui::resolve_schema(schema);
+        let app = TuiApp::builder()
+            .theme(Theme::from_name(generated::tui::THEME_NAME))
+            .schema(schema.clone())
+            .service(svc.clone())
+            .ctx(ctx.clone())
+            .labels(generated::tui::labels())
+            .build()
+            .map_err(anyhow::Error::msg)?;
         return app.run().await;
     }}
 
-    // extract_dispatch converts the parsed Commands enum into (resource, verb, ParsedArgs).
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
         "a subcommand is required unless --tui is set"
     ))?;
@@ -411,7 +449,7 @@ async fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#
-            .to_string()
+            )
         },
     )?;
 
@@ -494,7 +532,6 @@ impl VmDiskHandlerTrait for VmDiskHandler {
 "#,
         )?;
     } else {
-        // ── src/handlers/example.rs ───────────────────────────────────────────────
         std::fs::write(
             root.join("src/handlers/example.rs"),
             r#"use tku_core::prelude::*;
@@ -506,13 +543,11 @@ pub struct ExampleHandler;
 #[async_trait]
 impl ExampleHandlerTrait for ExampleHandler {
     async fn list(&self, _ctx: Ctx, args: ExampleListArgs) -> TkucliResult<impl IntoOutput> {
-        // args.limit is already a typed u32 — no manual parsing needed.
         let _ = args.limit;
         Ok(Success::new("list called — replace with real data"))
     }
 
     async fn get(&self, _ctx: Ctx, args: ExampleGetArgs) -> TkucliResult<impl IntoOutput> {
-        // args.id is already a typed u64.
         Ok(Success::new(format!("got id={}", args.id)))
     }
 }
@@ -523,7 +558,8 @@ impl ExampleHandlerTrait for ExampleHandler {
     println!("✓ Project created.");
     println!();
     println!("  cd {}", root.display());
-    println!("  cargo build          # runs codegen via build.rs");
+    println!("  cargo build          # default theme + profile");
+    println!("  TKU_TUI_THEME=light cargo build");
     if use_root_example {
         println!("  cargo run -- list");
         println!("  cargo run -- get 42");

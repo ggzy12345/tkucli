@@ -1,12 +1,12 @@
 [package]
 name    = "vm-cli"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
-tku-core    = "0.1.0"
-tku-tui     = "0.1.0"
-tku-macros  = "0.1.0"
+tku-core    = "0.1.1"
+tku-tui     = "0.1.1"
+tku-macros  = "0.1.1"
 tokio         = { version = "1", features = ["full"] }
 serde         = { version = "1", features = ["derive"] }
 clap          = { version = "4", features = ["derive"] }
@@ -15,4 +15,4 @@ async-trait   = "0.1"
 anyhow        = "1"
 
 [build-dependencies]
-tku-codegen = "0.1.0"
+tku-codegen = "0.1.1"

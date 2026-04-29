@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use tku_core::schema::{AppSchema, ArgType, ResourceSchema};
+use tku_core::schema::{is_builtin_tui_profile, AppSchema, ArgType, ResourceSchema};
 
 pub struct SchemaValidator<'a> {
     schema: &'a AppSchema,
@@ -13,6 +13,7 @@ impl<'a> SchemaValidator<'a> {
     pub fn validate(&self) -> anyhow::Result<()> {
         self.check_root_verb_uniqueness()?;
         self.check_root_vs_resource_collisions()?;
+        self.check_tui_profiles()?;
         self.check_resource_name_uniqueness(&self.schema.resources, None)?;
         self.check_verb_uniqueness(&self.schema.resources, Vec::new())?;
         self.check_command_name_collisions(&self.schema.resources, Vec::new())?;
@@ -48,6 +49,35 @@ impl<'a> SchemaValidator<'a> {
                 );
             }
         }
+        Ok(())
+    }
+
+    fn check_tui_profiles(&self) -> anyhow::Result<()> {
+        let mut seen = HashSet::new();
+        for profile in &self.schema.tui.profiles {
+            let name = profile.name.trim();
+            if name.is_empty() {
+                anyhow::bail!("TUI profile names must not be empty");
+            }
+            if !seen.insert(name) {
+                anyhow::bail!("duplicate TUI profile name: `{name}`");
+            }
+        }
+
+        if let Some(default_profile) = self.schema.tui.default_profile.as_deref() {
+            let is_named_profile = self
+                .schema
+                .tui
+                .profiles
+                .iter()
+                .any(|profile| profile.name == default_profile);
+            if !is_builtin_tui_profile(default_profile) && !is_named_profile {
+                anyhow::bail!(
+                    "default TUI profile `{default_profile}` does not exist as a built-in profile or in [[tui.profiles]]"
+                );
+            }
+        }
+
         Ok(())
     }
 
@@ -161,5 +191,32 @@ impl<'a> SchemaValidator<'a> {
             self.check_command_name_collisions(&resource.subresources, path)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SchemaValidator;
+    use tku_core::schema::AppSchema;
+
+    #[test]
+    fn validate_accepts_builtin_coder_profile() {
+        let schema = AppSchema::from_toml(
+            r#"
+[app]
+name = "demo"
+version = "0.1.0"
+description = "demo"
+
+[tui]
+enabled = true
+profile = "coder"
+"#,
+        )
+        .expect("schema should parse");
+
+        SchemaValidator::new(&schema)
+            .validate()
+            .expect("built-in coder profile should validate");
     }
 }
