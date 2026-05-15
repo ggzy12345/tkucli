@@ -242,7 +242,7 @@ async fn main() -> anyhow::Result<()> {{
 
     let ctx = CtxBuilder::default()
         .format(cli.format.parse::<RenderFormat>().unwrap_or_default())
-        .tui_mode(cli.tui)
+        .tui_mode(generated::tui::TUI_ENABLED && !cli.exec)
         .build();
 
     let svc = build_router(AppHandlers {{
@@ -265,7 +265,7 @@ async fn main() -> anyhow::Result<()> {{
     }}
 
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
-        "a subcommand is required unless --tui is set"
+        "a subcommand is required when TUI is disabled or --exec is set"
     ))?;
     let (resource, verb, args) = extract_dispatch(command);
     let req = CliRequest::new(ctx.clone(), resource, verb, args);
@@ -329,7 +329,7 @@ async fn main() -> anyhow::Result<()> {{
 
     let ctx = CtxBuilder::default()
         .format(cli.format.parse::<RenderFormat>().unwrap_or_default())
-        .tui_mode(cli.tui)
+        .tui_mode(generated::tui::TUI_ENABLED && !cli.exec)
         .build();
 
     let svc = build_router(AppHandlers {{
@@ -353,7 +353,7 @@ async fn main() -> anyhow::Result<()> {{
     }}
 
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
-        "a subcommand is required unless --tui is set"
+        "a subcommand is required when TUI is disabled or --exec is set"
     ))?;
     let (resource, verb, args) = extract_dispatch(command);
     let req = CliRequest::new(ctx.clone(), resource, verb, args);
@@ -416,7 +416,7 @@ async fn main() -> anyhow::Result<()> {{
 
     let ctx = CtxBuilder::default()
         .format(cli.format.parse::<RenderFormat>().unwrap_or_default())
-        .tui_mode(cli.tui)
+        .tui_mode(generated::tui::TUI_ENABLED && !cli.exec)
         .build();
 
     let svc = build_router(AppHandlers {{
@@ -439,7 +439,7 @@ async fn main() -> anyhow::Result<()> {{
     }}
 
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
-        "a subcommand is required unless --tui is set"
+        "a subcommand is required when TUI is disabled or --exec is set"
     ))?;
     let (resource, verb, args) = extract_dispatch(command);
     let req = CliRequest::new(ctx.clone(), resource, verb, args);
@@ -564,12 +564,13 @@ impl ExampleHandlerTrait for ExampleHandler {
         println!("  cargo run -- list");
         println!("  cargo run -- get 42");
     } else if use_subresource_example {
-        println!("  cargo run -- vm list");
-        println!("  cargo run -- vm disk attach 42 7");
+        println!("  cargo run -- -e vm list");
+        println!("  cargo run -- -e vm disk attach 42 7");
     } else {
-        println!("  cargo run -- example list");
+        println!("  cargo run -- -e example list");
     }
-    println!("  cargo run -- --tui   # launch interactive TUI");
+    println!("  cargo run --          # launch interactive TUI");
+    println!("  cargo run -- -e ...   # execute a command without the TUI");
 
     Ok(())
 }

@@ -92,6 +92,7 @@ impl TuiApp {
                     .expect("default profile resolution cannot fail")
             });
         let labels = ScreenLabels {
+            running: Some(resolved.labels.running),
             latest: Some(resolved.labels.latest),
             welcome_title: Some(resolved.labels.welcome_title),
             welcome_body: Some(resolved.labels.welcome_body),

@@ -45,7 +45,7 @@ pub enum OutputFormat {
 /// TUI configuration in `cli.toml`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TuiConfig {
-    /// Whether the `--tui` flag is available at runtime.
+    /// Whether the app launches the TUI by default when no `--exec` flag is set.
     #[serde(default)]
     pub enabled: bool,
     /// Color palette: `dark` | `light`

@@ -1241,7 +1241,7 @@ dependencies = [
 
 [[package]]
 name = "tku-codegen"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "prettyplease",
@@ -1256,7 +1256,7 @@ dependencies = [
 
 [[package]]
 name = "tku-core"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1274,7 +1274,7 @@ dependencies = [
 
 [[package]]
 name = "tku-macros"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1283,7 +1283,7 @@ dependencies = [
 
 [[package]]
 name = "tku-tui"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "arboard",
@@ -1299,7 +1299,7 @@ dependencies = [
 
 [[package]]
 name = "tkucli"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "clap",

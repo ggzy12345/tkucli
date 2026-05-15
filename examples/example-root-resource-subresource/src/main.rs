@@ -13,6 +13,9 @@ mod generated {
     pub mod router {
         include!(concat!(env!("OUT_DIR"), "/router.rs"));
     }
+    pub mod tui {
+        include!(concat!(env!("OUT_DIR"), "/tui.rs"));
+    }
 }
 
 use clap::Parser;
@@ -57,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
 
     let ctx = CtxBuilder::default()
         .format(cli.format.parse::<RenderFormat>().unwrap_or_default())
-        .tui_mode(cli.tui)
+        .tui_mode(generated::tui::TUI_ENABLED && !cli.exec)
         .build();
 
     let svc = build_router(AppHandlers {
@@ -75,7 +78,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
-        "a subcommand is required unless --tui is set"
+        "a subcommand is required when TUI is disabled or --exec is set"
     ))?;
     // resource will be "$root" for root verbs, a resource name otherwise
     let (resource, verb, args) = extract_dispatch(command);

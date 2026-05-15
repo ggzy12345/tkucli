@@ -5,6 +5,7 @@ use tku_core::schema::{AppSchema, OperationSchema, ResourceSchema};
 
 /// Default values used when the developer leaves a label field unset.
 pub(crate) const DEFAULT_LATEST: &str = "latest";
+pub(crate) const DEFAULT_RUNNING: &str = "running";
 pub(crate) const DEFAULT_WELCOME_TITLE: &str = "tkucli";
 pub(crate) const DEFAULT_WELCOME_BODY: &str = "Welcome to Tkucli TUI.\n\n\
     1. Move through actions below with j/k or the arrow keys.\n\
@@ -17,20 +18,28 @@ pub(crate) const DEFAULT_WELCOME_BODY: &str = "Welcome to Tkucli TUI.\n\n\
 /// above. Use `..Default::default()` to fill in only what you need:
 ///
 /// ```rust
-/// ScreenLabels {
+/// use tku_tui::ScreenLabels;
+///
+/// let _labels = ScreenLabels {
 ///     welcome_title: Some("My App".to_string()),
 ///     welcome_body:  Some("Welcome!".to_string()),
 ///     ..Default::default()          // running / latest keep their defaults
-/// }
+/// };
 /// ```
 #[derive(Clone, Default)]
 pub struct ScreenLabels {
+    pub running: Option<String>,
     pub latest: Option<String>,
     pub welcome_title: Option<String>,
     pub welcome_body: Option<String>,
 }
 
 impl ScreenLabels {
+    /// Returns the `running` value or the built-in default.
+    pub(crate) fn running_str(&self) -> &str {
+        self.running.as_deref().unwrap_or(DEFAULT_RUNNING)
+    }
+
     /// Returns the `latest` value or the built-in default.
     pub(crate) fn latest_str(&self) -> &str {
         self.latest.as_deref().unwrap_or(DEFAULT_LATEST)
@@ -649,7 +658,11 @@ pub(crate) fn push_bubble_lines(
     let body_prefix = if is_latest { "▌ " } else { "│ " };
 
     let status_tag: String = if entry.pending {
-        ProgressLabel::short(entry.pending_frame)
+        format!(
+            "{} {}",
+            ProgressLabel::short(entry.pending_frame),
+            labels.running_str()
+        )
     } else if is_latest {
         labels.latest_str().to_string()
     } else {

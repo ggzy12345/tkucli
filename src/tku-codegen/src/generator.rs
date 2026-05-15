@@ -118,8 +118,9 @@ impl<'a> CodeGenerator<'a> {
                 pub command: Option<Commands>,
                 #[arg(long, global = true, default_value = "table")]
                 pub format: String,
-                #[arg(long, global = true)]
-                pub tui: bool,
+                /// Execute a command without launching the TUI
+                #[arg(short = 'e', long, global = true)]
+                pub exec: bool,
                 #[arg(short, long, global = true)]
                 pub verbose: bool,
             }
@@ -415,22 +416,24 @@ impl<'a> CodeGenerator<'a> {
         let latest = resolved.labels.latest;
         let welcome_title = resolved.labels.welcome_title;
         let welcome_body = resolved.labels.welcome_body;
+        let tui_enabled = self.schema.tui.enabled;
 
         quote! {
             // Generated resolved TUI settings. Do not edit by hand.
             use tku_core::schema::AppSchema;
             use tku_tui::screen::ScreenLabels;
 
+            pub const TUI_ENABLED: bool = #tui_enabled;
             pub const SELECTED_PROFILE: Option<&str> = #selected_profile;
             pub const THEME_NAME: &str = #theme;
             pub const DEFAULT_SCREEN: Option<&str> = #default_screen;
 
             pub fn labels() -> ScreenLabels {
                 ScreenLabels {
-                    running: #running.to_string(),
-                    latest: #latest.to_string(),
-                    welcome_title: #welcome_title.to_string(),
-                    welcome_body: #welcome_body.to_string(),
+                    running: Some(#running.to_string()),
+                    latest: Some(#latest.to_string()),
+                    welcome_title: Some(#welcome_title.to_string()),
+                    welcome_body: Some(#welcome_body.to_string()),
                 }
             }
 

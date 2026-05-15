@@ -8,7 +8,7 @@ use tku_core::prelude::TaskSpinner;
 /// (e.g. `multipass list`, `multipass info`). No spinner is shown.
 ///
 /// - **TUI mode**: each meaningful output line replaces the bubble body in-place.
-/// - **CLI mode**: each line is printed directly to stdout as it arrives.
+/// - **CLI mode**: output is collected and rendered once by the caller.
 ///
 /// Returns `(exit_status, full_output)`.
 pub async fn run_streaming(
@@ -59,8 +59,6 @@ pub async fn run_streaming(
                 {
                     if ctx.tui_mode() {
                         ctx.progress.send(line.trim());
-                    } else {
-                        println!("{}", line.trim());
                     }
                 }
             }

@@ -14,6 +14,9 @@ mod generated {
     pub mod router {
         include!(concat!(env!("OUT_DIR"), "/router.rs"));
     }
+    pub mod tui {
+        include!(concat!(env!("OUT_DIR"), "/tui.rs"));
+    }
 }
 
 use clap::Parser;
@@ -48,7 +51,7 @@ async fn main() -> anyhow::Result<()> {
 
     let ctx = CtxBuilder::default()
         .format(cli.format.parse::<RenderFormat>().unwrap_or_default())
-        .tui_mode(cli.tui)
+        .tui_mode(generated::tui::TUI_ENABLED && !cli.exec)
         .build();
 
     // Build service stack once at startup.
@@ -65,18 +68,18 @@ async fn main() -> anyhow::Result<()> {
                     .schema(schema.clone())
                     .service(svc.clone())
                     .ctx(ctx.clone())
-                    .labels(ScreenLabels {
+                        .labels(ScreenLabels {
                         welcome_title: Some("Welcome to vm-cli".to_string()),
-                        welcome_body: Some("This is a demo of tku-tui.".to_string()),
+                        welcome_body:  Some("This is a demo of tku-tui.".to_string()),
                         ..Default::default()
-                        })
+                    })
                     .build()?;
         return app.run().await;
     }
 
     // extract_dispatch converts the parsed Commands enum into (resource, verb, ParsedArgs).
     let command = cli.command.ok_or_else(|| anyhow::anyhow!(
-        "a subcommand is required unless --tui is set"
+        "a subcommand is required when TUI is disabled or --exec is set"
     ))?;
     let (resource, verb, args) = extract_dispatch(command);
     let req = CliRequest::new(ctx.clone(), resource, verb, args);

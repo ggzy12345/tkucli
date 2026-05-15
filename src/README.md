@@ -4,6 +4,8 @@
 
 Define your CLI in a single `cli.toml` config file. Tkucli generates the entire command tree, argument parsers, handler trait stubs, and an interactive Ratatui TUI — you write only the business logic.
 
+When `[tui].enabled = true`, generated CLIs launch the TUI by default. Use `-e` / `--exec` to run a command directly without entering the TUI.
+
 ---
 
 ## Workspace layout
@@ -45,6 +47,7 @@ description = "My Tkucli CLI"
 [tui]
 enabled = true
 theme   = "dark"
+profile = "coder"  # recommended built-in profile
 
 [[resource]]
 name        = "users"
@@ -89,13 +92,24 @@ impl crate::generated::handler_traits::UsersHandler for UsersHandler {
 ### 5. Run
 
 ```bash
-cargo run -- users list
-cargo run -- users list --format json
-cargo run -- users get 42
-cargo run -- --tui          # interactive TUI
+cargo run --                      # interactive TUI
+cargo run -- -e users list        # execute once without the TUI
+cargo run -- --exec users list --format json
+cargo run -- -e users get 42
 ```
 
 ---
+
+## Runtime Modes
+
+Generated apps have two runtime modes:
+
+| Mode | How to launch | Behavior |
+|------|---------------|----------|
+| TUI | `my-app` | Starts the interactive Ratatui app when `[tui].enabled = true` |
+| Exec | `my-app -e users list` or `my-app --exec users list` | Runs the command once and prints the result |
+
+If `[tui].enabled = false`, the app stays in exec-style CLI behavior and requires a subcommand.
 
 ## Config reference
 
@@ -112,9 +126,12 @@ cargo run -- --tui          # interactive TUI
 
 | Key              | Type   | Default   | Description                        |
 |------------------|--------|-----------|------------------------------------|
-| `enabled`        | bool   | `false`   | Allow `--tui` flag                 |
+| `enabled`        | bool   | `false`   | Launch the TUI by default; use `-e` / `--exec` for direct command execution |
 | `theme`          | string | `"dark"`  | `dark` \| `light`                  |
+| `profile`        | string | —         | Built-in TUI profile: `coder` recommended, or `default` |
 | `default_screen` | string | —         | Resource name to show on launch    |
+
+Use `profile = "coder"` for the built-in workspace-style TUI. It is the recommended default for new projects.
 
 ### `[[resource]]`
 
