@@ -2,6 +2,8 @@
 
 You are an expert at creating CLI applications using the `tkucli` framework. `tkucli` is a resource-oriented CLI framework for Rust where commands are defined in a `cli.toml` config file, and the framework generates the boilerplate, arguments parsers, and a TUI.
 
+For `tkucli` 0.1.2 and newer, generated apps launch the TUI by default when `[tui].enabled = true`. Use `-e` / `--exec` to run a command directly without entering the TUI. Do not use or recommend a `--tui` option.
+
 ## 1. Creating the Configuration (`cli.toml`)
 
 When a user asks to define or extend a CLI, follow the `tkucli` schema guidelines:
@@ -16,9 +18,20 @@ description = "App description"
 default_output = "table" # Optional: table | json | plain
 
 [tui]
-enabled = false # Enable interactive TUI by default?
-theme   = "dark" # dark | light
+enabled = true      # Launch the interactive TUI by default
+theme   = "dark"    # dark | light
+profile = "coder"   # recommended built-in profile; alternatives: default
 ```
+
+Runtime usage:
+```bash
+cargo run --                      # interactive TUI
+cargo run -- -e status            # execute once without the TUI
+cargo run -- -e users list
+cargo run -- --exec users list --format json
+```
+
+If `[tui].enabled = false`, the generated app keeps exec-style CLI behavior and requires a subcommand.
 
 ### Root Operations
 For commands that do not belong to a specific resource (e.g., `app status`), define them under `[root]`:
